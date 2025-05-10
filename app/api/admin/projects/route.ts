@@ -223,10 +223,66 @@ export async function POST(request: NextRequest) {
     if (
       transactionError?.message?.includes(
         'function "create_project_with_relations" does not exist'
-      )
+      ) || 
+      transactionError?.message?.includes('syntax error')
     ) {
+      // Try the simpler function first
       console.warn(
-        "RPC function not available, using manual transaction process"
+        "Complex function failed, trying simpler function..."
+      );
+      
+      const { data: simpleResult, error: simpleError } = await supabase.rpc(
+        "create_project_simple",
+        {
+          p_title: title,
+          p_slug: slug,
+          p_description: description
+        }
+      );
+      
+      if (!simpleError && simpleResult?.success) {
+        // Simple function worked! Now add the related data separately
+        const projectId = simpleResult.project_id;
+        
+        try {
+          // Handle technologies
+          if (technologies.length > 0) {
+            const techInserts = technologies.map((tech) => ({
+              project_id: projectId,
+              name: tech,
+            }));
+
+            await supabase.from("project_technologies").insert(techInserts);
+          }
+
+          // Handle tags
+          if (tags.length > 0) {
+            const tagInserts = tags.map((tag) => ({
+              project_id: projectId,
+              name: tag,
+            }));
+
+            await supabase.from("project_tags").insert(tagInserts);
+          }
+          
+          // Return success
+          return NextResponse.json(
+            {
+              message: "Project created successfully with simplified method",
+              id: projectId,
+              slug,
+            },
+            { status: 201 }
+          );
+        } catch (error: any) {
+          console.error("Error adding related data:", error);
+          // Continue to manual transaction as fallback
+        }
+      }
+      
+      // If the simple function also failed, use manual transaction
+      console.warn(
+        "RPC functions not available, using manual transaction process"
       );
 
       // Create the project record

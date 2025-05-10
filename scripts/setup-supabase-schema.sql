@@ -468,133 +468,167 @@ BEGIN
   END IF;
 END $$;
 
--- Create function for transactional project creation
-CREATE OR REPLACE FUNCTION create_project_with_relations(
+-- Drop the function if it exists to avoid conflicts
+DROP FUNCTION IF EXISTS create_project_with_relations CASCADE;
+
+-- Create function for transactional project creation (simplified version)
+CREATE FUNCTION create_project_with_relations(
   project_data JSONB,
-  technologies_data JSONB DEFAULT '[]',
-  tags_data JSONB DEFAULT '[]',
-  challenges_data JSONB DEFAULT '[]',
-  milestones_data JSONB DEFAULT '[]',
-  images_data JSONB DEFAULT '[]'
+  technologies_data JSONB DEFAULT '[]'::JSONB,
+  tags_data JSONB DEFAULT '[]'::JSONB,
+  challenges_data JSONB DEFAULT '[]'::JSONB,
+  milestones_data JSONB DEFAULT '[]'::JSONB,
+  images_data JSONB DEFAULT '[]'::JSONB
+) 
+RETURNS JSONB
+LANGUAGE plpgsql
+AS $func$
+  DECLARE
+    new_project_id INTEGER;
+    tech_record JSONB;
+    tag_record JSONB;
+    challenge_record JSONB;
+    milestone_record JSONB;
+    image_record JSONB;
+    result JSONB;
+  BEGIN
+    -- Insert the project and get its ID
+    INSERT INTO projects (
+      title, slug, description, details, summary, 
+      thumbnail_url, main_image_url, github_url, demo_url, video_url,
+      start_date, end_date, is_featured, is_ongoing, status, 
+      order_index, client, created_at, updated_at
+    ) VALUES (
+      project_data->>'title',
+      project_data->>'slug',
+      project_data->>'description',
+      project_data->>'details',
+      project_data->>'summary',
+      project_data->>'thumbnail_url',
+      project_data->>'main_image_url',
+      project_data->>'github_url',
+      project_data->>'demo_url',
+      project_data->>'video_url',
+      (project_data->>'start_date')::DATE,
+      (project_data->>'end_date')::DATE,
+      (project_data->>'is_featured')::BOOLEAN,
+      (project_data->>'is_ongoing')::BOOLEAN,
+      project_data->>'status',
+      COALESCE((project_data->>'order_index')::INTEGER, 0),
+      project_data->>'client',
+      NOW(),
+      NOW()
+    ) RETURNING id INTO new_project_id;
+    
+    -- Insert technologies
+    IF jsonb_array_length(technologies_data) > 0 THEN
+      FOR tech_record IN SELECT * FROM jsonb_array_elements(technologies_data) LOOP
+        INSERT INTO project_technologies (project_id, name, icon, category)
+        VALUES (
+          new_project_id,
+          tech_record->>'name',
+          tech_record->>'icon',
+          tech_record->>'category'
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert tags
+    IF jsonb_array_length(tags_data) > 0 THEN
+      FOR tag_record IN SELECT * FROM jsonb_array_elements(tags_data) LOOP
+        INSERT INTO project_tags (project_id, name)
+        VALUES (
+          new_project_id,
+          tag_record->>'name'
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert challenges
+    IF jsonb_array_length(challenges_data) > 0 THEN
+      FOR challenge_record IN SELECT * FROM jsonb_array_elements(challenges_data) LOOP
+        INSERT INTO project_challenges (project_id, title, description, solution)
+        VALUES (
+          new_project_id,
+          challenge_record->>'title',
+          challenge_record->>'description',
+          challenge_record->>'solution'
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert milestones
+    IF jsonb_array_length(milestones_data) > 0 THEN
+      FOR milestone_record IN SELECT * FROM jsonb_array_elements(milestones_data) LOOP
+        INSERT INTO project_milestones (project_id, title, description, date, status)
+        VALUES (
+          new_project_id,
+          milestone_record->>'title',
+          milestone_record->>'description',
+          (milestone_record->>'date')::DATE,
+          COALESCE(milestone_record->>'status', 'completed')
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert images
+    IF jsonb_array_length(images_data) > 0 THEN
+      FOR image_record IN SELECT * FROM jsonb_array_elements(images_data) LOOP
+        INSERT INTO project_images (project_id, url, alt_text, caption, order_index)
+        VALUES (
+          new_project_id,
+          image_record->>'url',
+          image_record->>'alt_text',
+          image_record->>'caption',
+          COALESCE((image_record->>'order_index')::INTEGER, 0)
+        );
+      END LOOP;
+    END IF;
+    
+    -- Return success with project ID
+    result := jsonb_build_object(
+      'success', true,
+      'project_id', new_project_id,
+      'message', 'Project created successfully'
+    );
+    
+    RETURN result;
+  EXCEPTION WHEN OTHERS THEN
+    -- Handle errors and return an error object
+    result := jsonb_build_object(
+      'success', false,
+      'error', SQLERRM,
+      'message', 'Failed to create project: ' || SQLERRM
+    );
+    
+    RETURN result;
+  END;
+$func$;
+
+-- Create a simpler alternative function that doesn't use complex DECLARE
+CREATE OR REPLACE FUNCTION create_project_simple(
+  p_title TEXT,
+  p_slug TEXT, 
+  p_description TEXT
 ) RETURNS JSONB AS $$
 DECLARE
-  new_project_id INTEGER;
-  tech_record JSONB;
-  tag_record JSONB;
-  challenge_record JSONB;
-  milestone_record JSONB;
-  image_record JSONB;
-  result JSONB;
+  new_id INTEGER;
 BEGIN
-  -- Insert the project and get its ID
-  INSERT INTO projects (
-    title, slug, description, details, summary, 
-    thumbnail_url, main_image_url, github_url, demo_url, video_url,
-    start_date, end_date, is_featured, is_ongoing, status, 
-    order_index, client, created_at, updated_at
-  ) VALUES (
-    project_data->>'title',
-    project_data->>'slug',
-    project_data->>'description',
-    project_data->>'details',
-    project_data->>'summary',
-    project_data->>'thumbnail_url',
-    project_data->>'main_image_url',
-    project_data->>'github_url',
-    project_data->>'demo_url',
-    project_data->>'video_url',
-    (project_data->>'start_date')::DATE,
-    (project_data->>'end_date')::DATE,
-    (project_data->>'is_featured')::BOOLEAN,
-    (project_data->>'is_ongoing')::BOOLEAN,
-    project_data->>'status',
-    COALESCE((project_data->>'order_index')::INTEGER, 0),
-    project_data->>'client',
-    NOW(),
-    NOW()
-  ) RETURNING id INTO new_project_id;
+  -- Insert only the required fields
+  INSERT INTO projects (title, slug, description, created_at, updated_at)
+  VALUES (p_title, p_slug, p_description, NOW(), NOW())
+  RETURNING id INTO new_id;
   
-  -- Insert technologies
-  IF jsonb_array_length(technologies_data) > 0 THEN
-    FOR tech_record IN SELECT * FROM jsonb_array_elements(technologies_data) LOOP
-      INSERT INTO project_technologies (project_id, name, icon, category)
-      VALUES (
-        new_project_id,
-        tech_record->>'name',
-        tech_record->>'icon',
-        tech_record->>'category'
-      );
-    END LOOP;
-  END IF;
-  
-  -- Insert tags
-  IF jsonb_array_length(tags_data) > 0 THEN
-    FOR tag_record IN SELECT * FROM jsonb_array_elements(tags_data) LOOP
-      INSERT INTO project_tags (project_id, name)
-      VALUES (
-        new_project_id,
-        tag_record->>'name'
-      );
-    END LOOP;
-  END IF;
-  
-  -- Insert challenges
-  IF jsonb_array_length(challenges_data) > 0 THEN
-    FOR challenge_record IN SELECT * FROM jsonb_array_elements(challenges_data) LOOP
-      INSERT INTO project_challenges (project_id, title, description, solution)
-      VALUES (
-        new_project_id,
-        challenge_record->>'title',
-        challenge_record->>'description',
-        challenge_record->>'solution'
-      );
-    END LOOP;
-  END IF;
-  
-  -- Insert milestones
-  IF jsonb_array_length(milestones_data) > 0 THEN
-    FOR milestone_record IN SELECT * FROM jsonb_array_elements(milestones_data) LOOP
-      INSERT INTO project_milestones (project_id, title, description, date, status)
-      VALUES (
-        new_project_id,
-        milestone_record->>'title',
-        milestone_record->>'description',
-        (milestone_record->>'date')::DATE,
-        COALESCE(milestone_record->>'status', 'completed')
-      );
-    END LOOP;
-  END IF;
-  
-  -- Insert images
-  IF jsonb_array_length(images_data) > 0 THEN
-    FOR image_record IN SELECT * FROM jsonb_array_elements(images_data) LOOP
-      INSERT INTO project_images (project_id, url, alt_text, caption, order_index)
-      VALUES (
-        new_project_id,
-        image_record->>'url',
-        image_record->>'alt_text',
-        image_record->>'caption',
-        COALESCE((image_record->>'order_index')::INTEGER, 0)
-      );
-    END LOOP;
-  END IF;
-  
-  -- Return success with project ID
-  result := jsonb_build_object(
+  -- Return the ID
+  RETURN jsonb_build_object(
     'success', true,
-    'project_id', new_project_id,
-    'message', 'Project created successfully'
+    'project_id', new_id,
+    'message', 'Simple project created'
   );
-  
-  RETURN result;
 EXCEPTION WHEN OTHERS THEN
-  -- Handle errors and return an error object
-  result := jsonb_build_object(
+  RETURN jsonb_build_object(
     'success', false,
-    'error', SQLERRM,
-    'message', 'Failed to create project: ' || SQLERRM
+    'error', SQLERRM
   );
-  
-  RETURN result;
 END;
 $$ LANGUAGE plpgsql; 

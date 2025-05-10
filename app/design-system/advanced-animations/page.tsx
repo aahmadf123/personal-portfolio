@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Parallax,
   TextReveal,
@@ -8,13 +8,14 @@ import {
   Counter,
   AnimatedGradient,
   TypingAnimation,
-} from "@/components/design-system"
-import { Card, CardContent } from "@/components/ui/card"
-import { Heading, Text } from "@/components/design-system"
+} from "@/components/design-system";
+import { Card, CardContent } from "@/components/ui/card";
+import { Heading, Text } from "@/components/design-system";
+import { Suspense } from "react";
 
-export default function AdvancedAnimationsDemo() {
+function AdvancedAnimationsDemoContent() {
   // SVG path for demo
-  const svgPath = "M10,90 Q50,10 90,90"
+  const svgPath = "M10,90 Q50,10 90,90";
 
   return (
     <div className="container mx-auto py-24 px-4 space-y-32">
@@ -87,7 +88,10 @@ export default function AdvancedAnimationsDemo() {
         <Parallax speed={-0.2} className="absolute inset-0">
           <div className="absolute inset-0 grid grid-cols-4 gap-4 p-8 opacity-10">
             {Array.from({ length: 16 }).map((_, i) => (
-              <div key={i} className="aspect-square bg-primary rounded-full"></div>
+              <div
+                key={i}
+                className="aspect-square bg-primary rounded-full"
+              ></div>
             ))}
           </div>
         </Parallax>
@@ -122,7 +126,10 @@ export default function AdvancedAnimationsDemo() {
                 <Heading level={3} className="mb-2">
                   Interactive Card
                 </Heading>
-                <Text>Hover over this card to see a 3D effect. The card will tilt based on your cursor position.</Text>
+                <Text>
+                  Hover over this card to see a 3D effect. The card will tilt
+                  based on your cursor position.
+                </Text>
               </CardContent>
             </Card>
           </HoverCard>
@@ -136,15 +143,27 @@ export default function AdvancedAnimationsDemo() {
         </Heading>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <Counter end={95} suffix="%" className="text-5xl font-bold text-primary" />
+            <Counter
+              end={95}
+              suffix="%"
+              className="text-5xl font-bold text-primary"
+            />
             <Text className="mt-2">Client Satisfaction</Text>
           </div>
           <div>
-            <Counter end={120} prefix="+" className="text-5xl font-bold text-primary" />
+            <Counter
+              end={120}
+              prefix="+"
+              className="text-5xl font-bold text-primary"
+            />
             <Text className="mt-2">Projects Completed</Text>
           </div>
           <div>
-            <Counter end={4.9} decimals={1} className="text-5xl font-bold text-primary" />
+            <Counter
+              end={4.9}
+              decimals={1}
+              className="text-5xl font-bold text-primary"
+            />
             <Text className="mt-2">Average Rating</Text>
           </div>
         </div>
@@ -162,7 +181,10 @@ export default function AdvancedAnimationsDemo() {
           <Heading level={3} className="mb-4">
             Dynamic Background
           </Heading>
-          <Text>This section features an animated gradient background that smoothly transitions between colors.</Text>
+          <Text>
+            This section features an animated gradient background that smoothly
+            transitions between colors.
+          </Text>
         </AnimatedGradient>
       </section>
 
@@ -178,5 +200,13 @@ export default function AdvancedAnimationsDemo() {
         </div>
       </section>
     </div>
-  )
+  );
+}
+
+export default function AdvancedAnimationsDemo() {
+  return (
+    <Suspense fallback={<div>Loading animations...</div>}>
+      <AdvancedAnimationsDemoContent />
+    </Suspense>
+  );
 }

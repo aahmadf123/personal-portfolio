@@ -1,35 +1,40 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase"
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
-    const supabase = createClient()
+    const supabase = createClient();
 
     // Removed authentication check
 
     // Get query parameters
-    const { searchParams } = new URL(request.url)
-    const type = searchParams.get("type")
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get("type");
 
-    let query = supabase.from("vector_store").select("id, content, metadata")
+    let query = supabase.from("vector_store").select("id, content, metadata");
 
     // Filter by type if provided
     if (type) {
-      query = query.filter("metadata->type", "eq", type)
+      query = query.filter("metadata->type", "eq", type);
     }
 
     // Limit results
-    query = query.limit(100)
+    query = query.limit(100);
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
     if (error) {
-      throw error
+      throw error;
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching vector records:", error)
-    return NextResponse.json({ error: "Failed to fetch records" }, { status: 500 })
+    console.error("Error fetching vector records:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch records" },
+      { status: 500 }
+    );
   }
 }

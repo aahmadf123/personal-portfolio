@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getFeaturedResearchProjects } from "@/lib/research-project-service";
 
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = "force-dynamic"; // Ensure this route is always dynamically rendered
+// export const revalidate = 3600; // Revalidate every hour (can be re-enabled if ISR is preferred over pure dynamic)
 
 export async function GET(request: NextRequest) {
   try {

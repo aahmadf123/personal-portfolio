@@ -1,19 +1,23 @@
-import type { Organization } from "@/components/organizations"
+import type { Organization } from "@/components/organizations";
+import { transformStorageUrl } from "./storage-utils";
 
 // This would normally be an API call to fetch organizations
 // For this example, we'll just return the default organizations after a delay
 export async function fetchOrganizations(): Promise<Organization[]> {
   // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   // Return default organizations
   return [
     {
       name: "Pi Sigma Epsilon",
-      logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Pi_Sigma_Epsilon_professional_fraternity_crest-g3uQ5EApIBA3apGrNEhRpvxwgDohxL.jpeg",
+      logo: transformStorageUrl(
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Pi_Sigma_Epsilon_professional_fraternity_crest-g3uQ5EApIBA3apGrNEhRpvxwgDohxL.jpeg"
+      ),
       role: "Epsilon Delta Chapter, Member",
       period: "2020 - Present",
-      shortDescription: "National professional fraternity in marketing, sales, and management",
+      shortDescription:
+        "National professional fraternity in marketing, sales, and management",
       description:
         "Member of Pi Sigma Epsilon, the national professional fraternity in marketing, sales, and management. As part of the Epsilon Delta Chapter, I participate in professional development activities, networking events, and community service projects that enhance my leadership and business skills.",
       benefits: [
@@ -29,7 +33,9 @@ export async function fetchOrganizations(): Promise<Organization[]> {
     },
     {
       name: "IEEE",
-      logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ieee%20mb%20blue-dlYXWYesJXb1QZry5VNPYNmptNKt6H.png",
+      logo: transformStorageUrl(
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ieee%20mb%20blue-dlYXWYesJXb1QZry5VNPYNmptNKt6H.png"
+      ),
       role: "Member",
       period: "2019 - Present",
       shortDescription:
@@ -49,10 +55,13 @@ export async function fetchOrganizations(): Promise<Organization[]> {
     },
     {
       name: "AIChE",
-      logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/American%20Institute%20of%20Chemical%20Engineers_id9B2E87Q3_0-tInCnFiEekBKaoLrjGoUvZl9uqCsmx.png",
+      logo: transformStorageUrl(
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/American%20Institute%20of%20Chemical%20Engineers_id9B2E87Q3_0-tInCnFiEekBKaoLrjGoUvZl9uqCsmx.png"
+      ),
       role: "Member",
       period: "2021 - Present",
-      shortDescription: "Leading organization for chemical engineering professionals worldwide",
+      shortDescription:
+        "Leading organization for chemical engineering professionals worldwide",
       description:
         "Member of the American Institute of Chemical Engineers (AIChE), the world's leading organization for chemical engineering professionals. I engage with the latest developments in chemical engineering, process safety, and sustainable technology through conferences, publications, and networking opportunities.",
       benefits: [
@@ -66,5 +75,5 @@ export async function fetchOrganizations(): Promise<Organization[]> {
       url: "https://www.aiche.org/",
       color: "rgba(0, 102, 51, 0.05)", // AIChE green
     },
-  ]
+  ];
 }

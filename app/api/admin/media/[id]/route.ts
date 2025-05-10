@@ -1,35 +1,54 @@
-import { createClient } from "@/lib/supabase"
-import { del } from "@vercel/blob"
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase";
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+const BUCKET_NAME = "portfolio-bucket";
+
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export async function DELETE(request: NextRequest, { params }: Props) {
   try {
-    // Check authentication
-    const supabase = createClient()
-    const { data } = await supabase.auth.getSession()
+    // Verify authentication
+    const supabase = createClient();
+    const { data: authData } = await supabase.auth.getSession();
 
-    if (!data.session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!authData.session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const id = params.id
+    const id = params.id;
 
     if (!id) {
-      return NextResponse.json({ error: "No ID provided" }, { status: 400 })
+      return NextResponse.json({ error: "No ID provided" }, { status: 400 });
     }
 
     // Decode the ID as it might be URL encoded
-    const decodedId = decodeURIComponent(id)
+    const decodedPath = decodeURIComponent(id);
 
-    // Delete from Vercel Blob
-    await del(decodedId)
+    // Delete the file from Supabase Storage
+    const { error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .remove([decodedPath]);
 
-    return NextResponse.json({ success: true })
+    if (error) {
+      console.error("Supabase storage delete error:", error);
+      return NextResponse.json(
+        { error: error.message || "Failed to delete media" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting media:", error)
+    console.error("Error with storage:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete media" },
-      { status: 500 },
-    )
+      {
+        error: error instanceof Error ? error.message : "Storage service error",
+      },
+      { status: 500 }
+    );
   }
 }

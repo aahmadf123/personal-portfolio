@@ -1,0 +1,13 @@
+# List of Vercel Blob URLs to migrate to Supabase Storage
+# One URL per line
+
+# Organization logos
+https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Pi_Sigma_Epsilon_professional_fraternity_crest-g3uQ5EApIBA3apGrNEhRpvxwgDohxL.jpeg
+https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ieee%20mb%20blue-dlYXWYesJXb1QZry5VNPYNmptNKt6H.png
+https://hebbkx1anhila5yf.public.blob.vercel-storage.com/American%20Institute%20of%20Chemical%20Engineers_id9B2E87Q3_0-tInCnFiEekBKaoLrjGoUvZl9uqCsmx.png
+
+# Project images
+https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Homeowner_Loss_History-shHA6AKU04c0mesyToBcbntBQT0P2i.png
+https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChemECar.jpg-e4KwdtDo9QKTFFqSQ46RLq23OjAcVM.jpeg
+
+# Add more URLs as needed 

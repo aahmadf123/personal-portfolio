@@ -1,4 +1,5 @@
-import type { Project } from "../types/projects"
+import type { Project } from "../types/projects";
+import { transformStorageUrl } from "./storage-utils";
 
 // This service returns detailed project data
 export async function getProjectDetails(slug: string): Promise<Project | null> {
@@ -41,8 +42,9 @@ The automated pipeline we developed decreased manual intervention by 75% and acc
       start_date: "2024-08-01",
       end_date: "2025-05-01",
       priority: "high",
-      image_url:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Homeowner_Loss_History-shHA6AKU04c0mesyToBcbntBQT0P2i.png",
+      image_url: transformStorageUrl(
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Homeowner_Loss_History-shHA6AKU04c0mesyToBcbntBQT0P2i.png"
+      ),
       created_at: "2023-01-01T00:00:00Z",
       updated_at: "2023-01-01T00:00:00Z",
       technologies: [
@@ -81,25 +83,29 @@ The automated pipeline we developed decreased manual intervention by 75% and acc
         {
           id: 2,
           project_id: 1,
-          description: "Implementing effective feature engineering for complex insurance data",
+          description:
+            "Implementing effective feature engineering for complex insurance data",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 3,
           project_id: 1,
-          description: "Ensuring model interpretability for business stakeholders",
+          description:
+            "Ensuring model interpretability for business stakeholders",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 4,
           project_id: 1,
-          description: "Developing automated pipelines for model retraining and validation",
+          description:
+            "Developing automated pipelines for model retraining and validation",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 5,
           project_id: 1,
-          description: "Balancing model complexity with performance requirements",
+          description:
+            "Balancing model complexity with performance requirements",
           created_at: "2023-01-01T00:00:00Z",
         },
       ],
@@ -150,7 +156,11 @@ The automated pipeline we developed decreased manual intervention by 75% and acc
         { id: 2, name: "Data Science", created_at: "2023-01-01T00:00:00Z" },
         { id: 3, name: "XGBoost", created_at: "2023-01-01T00:00:00Z" },
         { id: 4, name: "Insurance", created_at: "2023-01-01T00:00:00Z" },
-        { id: 5, name: "Predictive Modeling", created_at: "2023-01-01T00:00:00Z" },
+        {
+          id: 5,
+          name: "Predictive Modeling",
+          created_at: "2023-01-01T00:00:00Z",
+        },
         { id: 6, name: "Python", created_at: "2023-01-01T00:00:00Z" },
         { id: 7, name: "CI/CD", created_at: "2023-01-01T00:00:00Z" },
         { id: 8, name: "Data Pipelines", created_at: "2023-01-01T00:00:00Z" },
@@ -227,31 +237,36 @@ Additionally, I contributed to revamping the disaster recovery testing regime by
         {
           id: 5,
           project_id: 2,
-          description: "Integrating disparate data sources with varying schemas and formats",
+          description:
+            "Integrating disparate data sources with varying schemas and formats",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 6,
           project_id: 2,
-          description: "Ensuring data consistency and integrity across multiple security platforms",
+          description:
+            "Ensuring data consistency and integrity across multiple security platforms",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 7,
           project_id: 2,
-          description: "Implementing robust data validation rules without impacting system performance",
+          description:
+            "Implementing robust data validation rules without impacting system performance",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 8,
           project_id: 2,
-          description: "Designing effective disaster recovery protocols for security-critical data",
+          description:
+            "Designing effective disaster recovery protocols for security-critical data",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 9,
           project_id: 2,
-          description: "Balancing security requirements with usability and performance",
+          description:
+            "Balancing security requirements with usability and performance",
           created_at: "2023-01-01T00:00:00Z",
         },
       ],
@@ -302,7 +317,11 @@ Additionally, I contributed to revamping the disaster recovery testing regime by
         { id: 7, name: "Security", created_at: "2023-01-01T00:00:00Z" },
         { id: 8, name: "PostgreSQL", created_at: "2023-01-01T00:00:00Z" },
         { id: 9, name: "Data Governance", created_at: "2023-01-01T00:00:00Z" },
-        { id: 10, name: "Disaster Recovery", created_at: "2023-01-01T00:00:00Z" },
+        {
+          id: 10,
+          name: "Disaster Recovery",
+          created_at: "2023-01-01T00:00:00Z",
+        },
         { id: 11, name: "ETL", created_at: "2023-01-01T00:00:00Z" },
         { id: 12, name: "SQL", created_at: "2023-01-01T00:00:00Z" },
       ],
@@ -378,19 +397,22 @@ This project not only showcases my web development skills but also demonstrates 
         {
           id: 9,
           project_id: 3,
-          description: "Optimizing neural network visualizations for performance across devices",
+          description:
+            "Optimizing neural network visualizations for performance across devices",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 10,
           project_id: 3,
-          description: "Implementing responsive design for complex interactive components",
+          description:
+            "Implementing responsive design for complex interactive components",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 11,
           project_id: 3,
-          description: "Balancing aesthetic design with performance considerations",
+          description:
+            "Balancing aesthetic design with performance considerations",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
@@ -402,7 +424,8 @@ This project not only showcases my web development skills but also demonstrates 
         {
           id: 13,
           project_id: 3,
-          description: "Managing API rate limits and costs for AI-powered features",
+          description:
+            "Managing API rate limits and costs for AI-powered features",
           created_at: "2023-01-01T00:00:00Z",
         },
       ],
@@ -463,7 +486,8 @@ This project not only showcases my web development skills but also demonstrates 
       id: 4,
       title: "ChemE Car Competition Project",
       slug: "cheme-car-competition",
-      description: "Interdisciplinary project developing a chemically powered car for the AIChE ChemE Car Competition.",
+      description:
+        "Interdisciplinary project developing a chemically powered car for the AIChE ChemE Car Competition.",
       detailed_description: `## Project Overview
 
 As a member of the American Institute of Chemical Engineers (AIChE) student chapter, I actively participated in the ChemE Car Competition project, an interdisciplinary endeavor that challenges teams to design and construct a car powered by chemical reactions. This project provided a unique opportunity to apply computer science and engineering principles in a chemical engineering context.
@@ -527,31 +551,36 @@ Our team's dedication and technical innovations led to successful qualification 
         {
           id: 13,
           project_id: 4,
-          description: "Designing robust sensor systems for a chemically reactive environment",
+          description:
+            "Designing robust sensor systems for a chemically reactive environment",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 14,
           project_id: 4,
-          description: "Implementing precise timing mechanisms for chemical reactions",
+          description:
+            "Implementing precise timing mechanisms for chemical reactions",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 15,
           project_id: 4,
-          description: "Ensuring reliability of electronic components in varying conditions",
+          description:
+            "Ensuring reliability of electronic components in varying conditions",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 16,
           project_id: 4,
-          description: "Balancing weight constraints with necessary control systems",
+          description:
+            "Balancing weight constraints with necessary control systems",
           created_at: "2023-01-01T00:00:00Z",
         },
         {
           id: 17,
           project_id: 4,
-          description: "Coordinating interdisciplinary requirements between chemical and computer systems",
+          description:
+            "Coordinating interdisciplinary requirements between chemical and computer systems",
           created_at: "2023-01-01T00:00:00Z",
         },
       ],
@@ -598,21 +627,38 @@ Our team's dedication and technical innovations led to successful qualification 
         },
       ],
       tags: [
-        { id: 16, name: "Chemical Engineering", created_at: "2023-01-01T00:00:00Z" },
+        {
+          id: 16,
+          name: "Chemical Engineering",
+          created_at: "2023-01-01T00:00:00Z",
+        },
         { id: 17, name: "Arduino", created_at: "2023-01-01T00:00:00Z" },
         { id: 18, name: "Sensors", created_at: "2023-01-01T00:00:00Z" },
         { id: 19, name: "Control Systems", created_at: "2023-01-01T00:00:00Z" },
-        { id: 20, name: "Interdisciplinary", created_at: "2023-01-01T00:00:00Z" },
+        {
+          id: 20,
+          name: "Interdisciplinary",
+          created_at: "2023-01-01T00:00:00Z",
+        },
         { id: 21, name: "AIChE", created_at: "2023-01-01T00:00:00Z" },
         { id: 22, name: "Competition", created_at: "2023-01-01T00:00:00Z" },
-        { id: 23, name: "Data Acquisition", created_at: "2023-01-01T00:00:00Z" },
+        {
+          id: 23,
+          name: "Data Acquisition",
+          created_at: "2023-01-01T00:00:00Z",
+        },
       ],
     },
-  }
+  };
 
-  return projects[slug] || null
+  return projects[slug] || null;
 }
 
 export async function getAllProjectSlugs(): Promise<string[]> {
-  return ["homeowner-loss-history-prediction", "security-data-tool", "ai-powered-portfolio", "cheme-car-competition"]
+  return [
+    "homeowner-loss-history-prediction",
+    "security-data-tool",
+    "ai-powered-portfolio",
+    "cheme-car-competition",
+  ];
 }

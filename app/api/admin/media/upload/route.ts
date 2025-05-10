@@ -1,50 +1,71 @@
-import { createClient } from "@/lib/supabase"
-import { put } from "@vercel/blob"
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase";
+
+const BUCKET_NAME = "portfolio-bucket";
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const supabase = createClient()
-    const { data } = await supabase.auth.getSession()
+    // Verify authentication
+    const supabase = createClient();
+    const { data: authData } = await supabase.auth.getSession();
 
-    if (!data.session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!authData.session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const formData = await request.formData()
-    const file = formData.get("file") as File | null
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 })
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
     // Generate a unique filename
-    const timestamp = new Date().getTime()
-    const folder = "media"
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-")
-    const filename = `${folder}/${timestamp}-${originalName}`
+    const timestamp = new Date().getTime();
+    const folder = "media";
+    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-");
+    const filename = `${folder}/${timestamp}-${originalName}`;
 
-    // Upload to Vercel Blob
-    const blob = await put(filename, file, {
-      access: "public",
-      addRandomSuffix: false,
-    })
+    // Convert File to ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(filename, arrayBuffer, {
+        contentType: file.type,
+        upsert: true,
+      });
+
+    if (error) {
+      console.error("Supabase storage upload error:", error);
+      return NextResponse.json(
+        { error: error.message || "Failed to upload file" },
+        { status: 500 }
+      );
+    }
+
+    // Get the public URL for the uploaded file
+    const { data: urlData } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(filename);
 
     return NextResponse.json({
-      id: blob.pathname,
-      url: blob.url,
-      pathname: blob.pathname,
+      id: filename,
+      url: urlData.publicUrl,
+      path: filename,
       filename: originalName,
-      contentType: blob.contentType,
-      size: blob.size,
+      contentType: file.type,
+      size: file.size,
       createdAt: new Date().toISOString(),
-    })
+    });
   } catch (error) {
-    console.error("Error uploading media:", error)
+    console.error("Error with storage:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to upload media" },
-      { status: 500 },
-    )
+      {
+        error: error instanceof Error ? error.message : "Storage service error",
+      },
+      { status: 500 }
+    );
   }
 }

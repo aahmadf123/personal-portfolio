@@ -1,0 +1,360 @@
+import { createClient } from "@/lib/supabase";
+import type { Project } from "@/types/projects";
+import type { Organization } from "@/components/organizations";
+import type { SkillCategory } from "@/types/skills";
+import { transformStorageUrl } from "./storage-utils";
+
+/**
+ * Utility functions for fetching content from Supabase database
+ */
+
+// Projects
+export async function getProjects(): Promise<Project[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*, project_technologies(*), project_tags(*), project_images(*)")
+    .order("order_index", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching projects:", error);
+    throw error;
+  }
+
+  // Process image URLs and transform data to match expected Project type
+  return data.map((project) => ({
+    ...project,
+    id: project.id.toString(),
+    image_url: transformStorageUrl(
+      project.main_image_url || project.thumbnail_url
+    ),
+    technologies: project.project_technologies
+      ? project.project_technologies.map((tech: any) => tech.name)
+      : [],
+    tags: project.project_tags
+      ? project.project_tags.map((tag: any) => tag.name)
+      : [],
+    images: project.project_images
+      ? project.project_images.map((img: any) => ({
+          url: transformStorageUrl(img.url),
+          alt: img.alt_text || project.title,
+          caption: img.caption || "",
+        }))
+      : [],
+    featured: project.is_featured,
+    completion:
+      project.status === "completed"
+        ? 100
+        : project.status === "in-progress"
+        ? 50
+        : project.status === "planned"
+        ? 0
+        : 75,
+  }));
+}
+
+export async function getProjectBySlug(slug: string): Promise<Project | null> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("projects")
+    .select(
+      `
+      *,
+      project_challenges(*),
+      project_milestones(*),
+      project_tags(*),
+      project_technologies(*),
+      project_images(*)
+    `
+    )
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) {
+    console.error(`Error fetching project with slug ${slug}:`, error);
+    throw error;
+  }
+
+  if (!data) return null;
+
+  // Process image URLs and transform data
+  return {
+    ...data,
+    id: data.id.toString(),
+    image_url: transformStorageUrl(data.main_image_url || data.thumbnail_url),
+    technologies: data.project_technologies
+      ? data.project_technologies.map((tech: any) => tech.name)
+      : [],
+    tags: data.project_tags
+      ? data.project_tags.map((tag: any) => tag.name)
+      : [],
+    challenges: data.project_challenges || [],
+    milestones: data.project_milestones || [],
+    images: data.project_images
+      ? data.project_images.map((img: any) => ({
+          url: transformStorageUrl(img.url),
+          alt: img.alt_text || data.title,
+          caption: img.caption || "",
+        }))
+      : [],
+    featured: data.is_featured,
+    completion:
+      data.status === "completed"
+        ? 100
+        : data.status === "in-progress"
+        ? 50
+        : data.status === "planned"
+        ? 0
+        : 75,
+  };
+}
+
+export async function getFeaturedProjects(): Promise<Project[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*, project_technologies(*), project_tags(*), project_images(*)")
+    .eq("is_featured", true)
+    .order("order_index", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching featured projects:", error);
+    throw error;
+  }
+
+  // Process image URLs
+  return data.map((project) => ({
+    ...project,
+    id: project.id.toString(),
+    image_url: transformStorageUrl(
+      project.main_image_url || project.thumbnail_url
+    ),
+    technologies: project.project_technologies
+      ? project.project_technologies.map((tech: any) => tech.name)
+      : [],
+    tags: project.project_tags
+      ? project.project_tags.map((tag: any) => tag.name)
+      : [],
+    images: project.project_images
+      ? project.project_images.map((img: any) => ({
+          url: transformStorageUrl(img.url),
+          alt: img.alt_text || project.title,
+          caption: img.caption || "",
+        }))
+      : [],
+    featured: project.is_featured,
+    completion:
+      project.status === "completed"
+        ? 100
+        : project.status === "in-progress"
+        ? 50
+        : project.status === "planned"
+        ? 0
+        : 75,
+  }));
+}
+
+// Organizations
+export async function getOrganizations(): Promise<Organization[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("organizations")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching organizations:", error);
+    throw error;
+  }
+
+  // Process logo URLs
+  return data.map((org) => ({
+    ...org,
+    logo: transformStorageUrl(org.logo),
+  }));
+}
+
+// Skills
+export async function getSkillCategories(): Promise<SkillCategory[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("skills")
+    .select("*")
+    .order("order_index", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching skills:", error);
+    throw error;
+  }
+
+  // Group skills by category
+  const categoriesMap = new Map<string, SkillCategory>();
+
+  data.forEach((skill) => {
+    if (!categoriesMap.has(skill.category)) {
+      categoriesMap.set(skill.category, {
+        id: skill.category,
+        name: skill.category,
+        skills: [],
+      });
+    }
+
+    categoriesMap.get(skill.category)?.skills.push({
+      id: skill.id.toString(),
+      name: skill.name,
+      proficiency: skill.proficiency,
+      icon: skill.icon,
+      featured: skill.is_featured,
+      sort_order: skill.order_index,
+    });
+  });
+
+  // Convert map to array and sort skills within each category
+  return Array.from(categoriesMap.values()).map((category) => ({
+    ...category,
+    skills: category.skills.sort((a, b) => a.sort_order - b.sort_order),
+  }));
+}
+
+// Blog posts
+export async function getBlogPosts(limit?: number) {
+  const supabase = createClient();
+  let query = supabase
+    .from("blog_posts")
+    .select(
+      `
+      *,
+      categories(*),
+      blog_post_tags!inner(
+        *,
+        blog_tags(*)
+      )
+    `
+    )
+    .eq("published", true)
+    .order("created_at", { ascending: false });
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Error fetching blog posts:", error);
+    throw error;
+  }
+
+  // Process data and extract tags
+  return data.map((post) => {
+    const tags = post.blog_post_tags
+      ? post.blog_post_tags.map((postTag: any) => postTag.blog_tags)
+      : [];
+
+    return {
+      ...post,
+      cover_image: transformStorageUrl(post.image_url),
+      summary: post.excerpt,
+      tags: tags,
+      category: post.categories,
+      read_time: post.read_time ? `${post.read_time} min read` : "5 min read",
+    };
+  });
+}
+
+export async function getBlogPostBySlug(slug: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select(
+      `
+      *,
+      categories(*),
+      blog_post_tags!inner(
+        *,
+        blog_tags(*)
+      )
+    `
+    )
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) {
+    console.error(`Error fetching blog post with slug ${slug}:`, error);
+    throw error;
+  }
+
+  if (!data) return null;
+
+  // Process data and extract tags
+  const tags = data.blog_post_tags
+    ? data.blog_post_tags.map((postTag: any) => postTag.blog_tags)
+    : [];
+
+  return {
+    ...data,
+    cover_image: transformStorageUrl(data.image_url),
+    summary: data.excerpt,
+    tags: tags,
+    category: data.categories,
+    read_time: data.read_time ? `${data.read_time} min read` : "5 min read",
+  };
+}
+
+// Timeline
+export async function getTimelineEvents() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("timeline_events")
+    .select("*")
+    .order("date", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching timeline events:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+// Case studies
+export async function getCaseStudies() {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("case_studies")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching case studies:", error);
+    throw error;
+  }
+
+  // Process image URLs
+  return data.map((study) => ({
+    ...study,
+    cover_image: transformStorageUrl(study.cover_image),
+  }));
+}
+
+export async function getCaseStudyBySlug(slug: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("case_studies")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) {
+    console.error(`Error fetching case study with slug ${slug}:`, error);
+    throw error;
+  }
+
+  if (!data) return null;
+
+  // Process image URL
+  return {
+    ...data,
+    cover_image: transformStorageUrl(data.cover_image),
+  };
+}

@@ -1,0 +1,120 @@
+/* Card Component */
+
+.card {
+  border-radius: var(--ds-border-radius-lg);
+  background-color: var(--ds-color-card);
+  border: 1px solid var(--ds-color-card-border);
+  color: var(--ds-color-card-foreground);
+  overflow: hidden;
+}
+
+.card-hover:hover {
+  box-shadow: var(--ds-shadow-md);
+  transform: translateY(-2px);
+  transition: var(--ds-transition-all);
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-header {
+  padding: var(--ds-spacing-4) var(--ds-spacing-6);
+  border-bottom: 1px solid var(--ds-color-card-border);
+}
+
+.card-body {
+  padding: var(--ds-spacing-6);
+}
+
+.card-footer {
+  padding: var(--ds-spacing-4) var(--ds-spacing-6);
+  border-top: 1px solid var(--ds-color-card-border);
+}
+
+/* Card variants */
+.card-primary {
+  border-top: 4px solid var(--ds-color-primary-500);
+}
+
+.card-secondary {
+  border-top: 4px solid var(--ds-color-secondary-500);
+}
+
+.card-tertiary {
+  border-top: 4px solid var(--ds-color-tertiary-500);
+}
+
+.card-accent {
+  border-top: 4px solid var(--ds-color-accent-500);
+}
+
+/* Card sizes */
+.card-sm {
+  max-width: 300px;
+}
+
+.card-md {
+  max-width: 500px;
+}
+
+.card-lg {
+  max-width: 800px;
+}
+
+.card-full {
+  width: 100%;
+  max-width: none;
+}
+
+/* Card with shadow */
+.card-shadow-sm {
+  box-shadow: var(--ds-shadow-sm);
+}
+
+.card-shadow-md {
+  box-shadow: var(--ds-shadow-md);
+}
+
+.card-shadow-lg {
+  box-shadow: var(--ds-shadow-lg);
+}
+
+/* Card with image */
+.card-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.card-image-top {
+  border-top-left-radius: var(--ds-border-radius-lg);
+  border-top-right-radius: var(--ds-border-radius-lg);
+}
+
+.card-image-bottom {
+  border-bottom-left-radius: var(--ds-border-radius-lg);
+  border-bottom-right-radius: var(--ds-border-radius-lg);
+}
+
+/* Card with horizontal layout */
+.card-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.card-horizontal .card-image {
+  max-width: 40%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .card-horizontal {
+    flex-direction: column;
+  }
+
+  .card-horizontal .card-image {
+    max-width: 100%;
+  }
+}

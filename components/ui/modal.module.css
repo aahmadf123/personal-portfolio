@@ -1,0 +1,109 @@
+/* Modal Component Styles */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+}
+
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 50;
+  display: grid;
+  width: 100%;
+  max-width: 32rem;
+  transform: translate(-50%, -50%);
+  gap: 1rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--background);
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition-duration: 200ms;
+}
+
+@media (min-width: 640px) {
+  .modal {
+    border-radius: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal {
+    width: 90%;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.closeButton {
+  border-radius: 9999px;
+  padding: 0.375rem;
+  color: var(--muted-foreground);
+  transition-property: background-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.closeButton:hover {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+
+.content {
+  max-height: calc(100vh - 10rem);
+  overflow-y: auto;
+}
+
+/* Animation states */
+.backdropEnter {
+  opacity: 0;
+}
+
+.backdropEnterActive {
+  opacity: 1;
+  transition: opacity 200ms ease-out;
+}
+
+.backdropExit {
+  opacity: 1;
+}
+
+.backdropExitActive {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+}
+
+.modalEnter {
+  opacity: 0;
+  transform: translate(-50%, -45%) scale(0.95);
+}
+
+.modalEnterActive {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+.modalExit {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.modalExitActive {
+  opacity: 0;
+  transform: translate(-50%, -45%) scale(0.95);
+  transition: opacity 200ms ease-in, transform 200ms ease-in;
+}

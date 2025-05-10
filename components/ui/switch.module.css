@@ -1,0 +1,80 @@
+/* Switch Component Styles */
+.switchRoot {
+  display: inline-flex;
+  align-items: center;
+  width: 2.5rem;
+  height: 1.5rem;
+  background-color: var(--muted);
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition-property: background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.switchRoot:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.switchRoot[data-state="checked"] {
+  background-color: var(--primary);
+}
+
+.switchRoot[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.switchThumb {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--background);
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  transform: translateX(0.25rem);
+}
+
+.switchThumb[data-state="checked"] {
+  transform: translateX(1.25rem);
+}
+
+/* Sizes */
+.sm {
+  width: 2rem;
+  height: 1.25rem;
+}
+
+.sm .switchThumb {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.sm .switchThumb[data-state="checked"] {
+  transform: translateX(1rem);
+}
+
+.md {
+  width: 2.5rem;
+  height: 1.5rem;
+}
+
+.lg {
+  width: 3rem;
+  height: 1.75rem;
+}
+
+.lg .switchThumb {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lg .switchThumb[data-state="checked"] {
+  transform: translateX(1.5rem);
+}

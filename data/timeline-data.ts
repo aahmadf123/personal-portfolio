@@ -1,0 +1,148 @@
+import type { TimelineEntry } from "@/components/interactive-timeline"
+
+export const timelineData: TimelineEntry[] = [
+  {
+    id: "edu-1",
+    type: "education",
+    title: "B.S. Computer Science & Engineering",
+    organization: "The University of Toledo",
+    description:
+      "Pursued a comprehensive program in Computer Science & Engineering with a minor in Mathematics. Focused on AI, machine learning, and quantum computing applications.",
+    startDate: "2019-09",
+    endDate: "present",
+    tags: ["Computer Science", "Engineering", "Mathematics", "AI/ML"],
+    link: "#",
+  },
+  {
+    id: "edu-2",
+    type: "education",
+    title: "Advanced Certification in Quantum Computing",
+    organization: "Quantum Computing Institute",
+    description:
+      "Completed specialized training in quantum algorithms, quantum machine learning, and quantum simulation techniques.",
+    startDate: "2022-06",
+    endDate: "2022-12",
+    tags: ["Quantum Computing", "Quantum Algorithms", "Qiskit"],
+    link: "#",
+  },
+  {
+    id: "edu-3",
+    type: "education",
+    title: "Deep Learning Specialization",
+    organization: "Coursera & deeplearning.ai",
+    description:
+      "Mastered deep learning techniques including CNNs, RNNs, and transformers through a comprehensive specialization program.",
+    startDate: "2021-03",
+    endDate: "2021-08",
+    tags: ["Deep Learning", "Neural Networks", "Computer Vision", "NLP"],
+    link: "#",
+  },
+  {
+    id: "work-1",
+    type: "work",
+    title: "IT Student Assistant",
+    organization: "University Medical Center",
+    description:
+      "Streamlined troubleshooting processes resulting in a 60% reduction in recurring IT issues, significantly improving operational efficiency for both students and medical staff.",
+    startDate: "2020-06",
+    endDate: "2021-08",
+    tags: ["IT Support", "Process Optimization", "Technical Documentation"],
+    link: "#",
+  },
+  {
+    id: "work-2",
+    type: "work",
+    title: "Research Assistant - AI Lab",
+    organization: "The University of Toledo",
+    description:
+      "Contributed to research on neural network optimization techniques for resource-constrained environments. Implemented and tested novel compression algorithms.",
+    startDate: "2021-09",
+    endDate: "present",
+    tags: ["AI Research", "Neural Networks", "Model Optimization"],
+    link: "#",
+  },
+  {
+    id: "work-3",
+    type: "work",
+    title: "Software Engineering Intern",
+    organization: "Aerospace Systems Inc.",
+    description:
+      "Developed software components for UAV navigation systems using computer vision and reinforcement learning techniques.",
+    startDate: "2022-05",
+    endDate: "2022-08",
+    tags: ["Software Development", "Computer Vision", "Reinforcement Learning"],
+    link: "#",
+  },
+  {
+    id: "project-1",
+    type: "project",
+    title: "Autonomous UAV Navigation System",
+    organization: "Senior Design Project",
+    description:
+      "Developed a real-time navigation system for UAVs using computer vision and reinforcement learning. This system enables autonomous flight in GPS-denied environments with 95% accuracy.",
+    startDate: "2022-01",
+    endDate: "2022-05",
+    tags: ["Computer Vision", "Reinforcement Learning", "Robotics"],
+    link: "#",
+  },
+  {
+    id: "project-2",
+    type: "project",
+    title: "Quantum-Inspired Optimization Algorithm",
+    organization: "Research Project",
+    description:
+      "Implemented a novel optimization algorithm inspired by quantum computing principles to solve complex aerospace engineering problems.",
+    startDate: "2022-09",
+    endDate: "2023-03",
+    tags: ["Quantum Computing", "Optimization", "Research"],
+    link: "#",
+  },
+  {
+    id: "project-3",
+    type: "project",
+    title: "Neural Network Compression for Edge Devices",
+    organization: "AI Lab Research",
+    description:
+      "Developed techniques to compress large neural networks for deployment on resource-constrained edge devices without significant accuracy loss.",
+    startDate: "2021-10",
+    endDate: "2022-04",
+    tags: ["Edge AI", "Model Compression", "Embedded Systems"],
+    link: "#",
+  },
+  {
+    id: "achievement-1",
+    type: "achievement",
+    title: "Best Student Paper Award",
+    organization: "International Conference on AI & Robotics",
+    description:
+      "Received the Best Student Paper Award for research on efficient neural network architectures for UAV navigation systems.",
+    startDate: "2022-07",
+    endDate: "2022-07",
+    tags: ["Research", "Academic Achievement", "Neural Networks"],
+    link: "#",
+  },
+  {
+    id: "achievement-2",
+    type: "achievement",
+    title: "Hackathon Winner - AI for Good",
+    organization: "Global AI Hackathon",
+    description:
+      "Led a team that developed an AI-powered solution for early detection of crop diseases using satellite imagery and deep learning.",
+    startDate: "2021-11",
+    endDate: "2021-11",
+    tags: ["Hackathon", "AI for Good", "Computer Vision"],
+    link: "#",
+  },
+  {
+    id: "achievement-3",
+    type: "achievement",
+    title: "Dean's List",
+    organization: "The University of Toledo",
+    description:
+      "Consistently maintained a GPA above 3.8, earning a place on the Dean's List for academic excellence for 6 consecutive semesters.",
+    startDate: "2019-09",
+    endDate: "present",
+    tags: ["Academic Excellence", "Recognition"],
+    link: "#",
+  },
+]

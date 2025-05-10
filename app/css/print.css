@@ -1,0 +1,100 @@
+/* Print Stylesheet */
+
+@media print {
+  /* Hide elements not needed for printing */
+  header nav,
+  footer,
+  .no-print,
+  button,
+  .social-icons,
+  .theme-toggle,
+  .back-to-top {
+    display: none !important;
+  }
+
+  /* Ensure the page background is white */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Make links more readable */
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Show the URL after links */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+  }
+
+  /* Don't show URL for internal links */
+  a[href^="/"]:after,
+  a[href^="#"]:after {
+    content: "";
+  }
+
+  /* Improve readability */
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Avoid page breaks after headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+  }
+
+  /* Ensure images fit on the page */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Add page numbers */
+  @page {
+    margin: 2cm;
+  }
+
+  @page :first {
+    margin-top: 3cm;
+  }
+
+  /* Ensure tables don't break across pages */
+  table {
+    page-break-inside: avoid;
+  }
+
+  /* Make sure the content is readable */
+  pre,
+  blockquote {
+    page-break-inside: avoid;
+    border: 1px solid #999;
+    padding: 0.5em;
+  }
+
+  /* Ensure proper layout */
+  .container {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Improve contrast for code blocks */
+  pre,
+  code {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+    color: #333 !important;
+  }
+}

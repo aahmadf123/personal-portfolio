@@ -1,0 +1,116 @@
+.accordion {
+  width: 100%;
+  border-radius: var(--ds-border-radius-md);
+  overflow: hidden;
+}
+
+.item {
+  border-bottom: 1px solid var(--ds-color-accordion-border);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--ds-spacing-4);
+  background-color: var(--ds-color-accordion-bg);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-color-accordion-text);
+  transition: background-color 0.2s;
+}
+
+.header:hover {
+  background-color: var(--ds-color-accordion-hover);
+}
+
+.header:focus {
+  outline: 2px solid var(--ds-color-ring);
+  outline-offset: -2px;
+}
+
+.icon {
+  flex-shrink: 0;
+  transition: transform 0.3s;
+}
+
+.iconOpen {
+  transform: rotate(180deg);
+}
+
+.content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease-out;
+}
+
+.contentInner {
+  padding: var(--ds-spacing-4);
+  padding-top: 0;
+}
+
+.contentOpen {
+  max-height: 1000px; /* Arbitrary large value */
+  transition: max-height 0.5s ease-in;
+}
+
+/* Variants */
+.bordered {
+  border: 1px solid var(--ds-color-accordion-border);
+}
+
+.bordered .item {
+  border-bottom: 1px solid var(--ds-color-accordion-border);
+}
+
+.bordered .item:last-child {
+  border-bottom: none;
+}
+
+.filled .header {
+  background-color: var(--ds-color-muted);
+}
+
+.filled .header:hover {
+  background-color: var(--ds-color-accordion-hover);
+}
+
+.primary .header {
+  color: var(--ds-color-primary-700);
+}
+
+.primary .header:hover {
+  background-color: var(--ds-color-primary-50);
+}
+
+.primary.filled .header {
+  background-color: var(--ds-color-primary-50);
+}
+
+.primary.filled .header:hover {
+  background-color: var(--ds-color-primary-100);
+}
+
+/* Dark mode adjustments for primary variant */
+.dark .primary .header {
+  color: var(--ds-color-primary-400);
+}
+
+.dark .primary .header:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.dark .primary.filled .header {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.dark .primary.filled .header:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+}

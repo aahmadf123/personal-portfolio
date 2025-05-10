@@ -1,0 +1,154 @@
+.tooltipContainer {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: var(--ds-z-50);
+  visibility: hidden;
+  opacity: 0;
+  padding: var(--ds-spacing-2) var(--ds-spacing-3);
+  background-color: var(--ds-color-tooltip-bg);
+  color: var(--ds-color-tooltip-text);
+  border-radius: var(--ds-border-radius-md);
+  font-size: var(--ds-font-size-sm);
+  max-width: 250px;
+  width: max-content;
+  text-align: center;
+  transition: opacity 0.2s, visibility 0.2s;
+  box-shadow: var(--ds-shadow-md);
+  pointer-events: none;
+}
+
+.tooltipContainer:hover .tooltip,
+.tooltipContainer:focus-within .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Positions */
+.top {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+.bottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+}
+
+.left {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px);
+}
+
+.right {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
+}
+
+/* Arrow */
+.tooltip::after {
+  content: "";
+  position: absolute;
+  border-style: solid;
+  border-width: 5px;
+}
+
+.top::after {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: var(--ds-color-tooltip-bg) transparent transparent transparent;
+}
+
+.bottom::after {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: transparent transparent var(--ds-color-tooltip-bg) transparent;
+}
+
+.left::after {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-color: transparent transparent transparent var(--ds-color-tooltip-bg);
+}
+
+.right::after {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-color: transparent var(--ds-color-tooltip-bg) transparent transparent;
+}
+
+/* Variants */
+.dark {
+  background-color: var(--ds-color-tooltip-bg);
+  color: var(--ds-color-tooltip-text);
+}
+
+.dark.top::after {
+  border-color: var(--ds-color-tooltip-bg) transparent transparent transparent;
+}
+
+.dark.bottom::after {
+  border-color: transparent transparent var(--ds-color-tooltip-bg) transparent;
+}
+
+.dark.left::after {
+  border-color: transparent transparent transparent var(--ds-color-tooltip-bg);
+}
+
+.dark.right::after {
+  border-color: transparent var(--ds-color-tooltip-bg) transparent transparent;
+}
+
+.light {
+  background-color: var(--ds-color-tooltip-light-bg);
+  color: var(--ds-color-tooltip-light-text);
+  border: 1px solid var(--ds-color-tooltip-light-border);
+}
+
+.light.top::after {
+  border-color: var(--ds-color-tooltip-light-bg) transparent transparent transparent;
+}
+
+.light.bottom::after {
+  border-color: transparent transparent var(--ds-color-tooltip-light-bg) transparent;
+}
+
+.light.left::after {
+  border-color: transparent transparent transparent var(--ds-color-tooltip-light-bg);
+}
+
+.light.right::after {
+  border-color: transparent var(--ds-color-tooltip-light-bg) transparent transparent;
+}
+
+.primary {
+  background-color: var(--ds-color-primary-500);
+  color: white;
+}
+
+.primary.top::after {
+  border-color: var(--ds-color-primary-500) transparent transparent transparent;
+}
+
+.primary.bottom::after {
+  border-color: transparent transparent var(--ds-color-primary-500) transparent;
+}
+
+.primary.left::after {
+  border-color: transparent transparent transparent var(--ds-color-primary-500);
+}
+
+.primary.right::after {
+  border-color: transparent var(--ds-color-primary-500) transparent transparent;
+}

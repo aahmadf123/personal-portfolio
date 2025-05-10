@@ -1,0 +1,6 @@
+app/not-found.tsx
+app/not-found.js
+app/_not-found
+app/[...not_found]
+pages/404.js
+pages/_error.js

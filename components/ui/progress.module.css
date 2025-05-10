@@ -1,0 +1,67 @@
+/* Progress Component Styles */
+.progressContainer {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--secondary);
+  border-radius: 9999px;
+  width: 100%;
+  height: 0.75rem;
+}
+
+.progressBar {
+  height: 100%;
+  width: 0%;
+  background-color: var(--primary);
+  transition-property: width;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Sizes */
+.sm {
+  height: 0.5rem;
+}
+
+.md {
+  height: 0.75rem;
+}
+
+.lg {
+  height: 1rem;
+}
+
+/* Variants */
+.default .progressBar {
+  background-color: var(--primary);
+}
+
+.success .progressBar {
+  background-color: var(--success);
+}
+
+.warning .progressBar {
+  background-color: var(--warning);
+}
+
+.error .progressBar {
+  background-color: var(--destructive);
+}
+
+.info .progressBar {
+  background-color: var(--info);
+}
+
+/* Indeterminate animation */
+.indeterminate .progressBar {
+  width: 50%;
+  animation: indeterminate 1.5s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
+}
+
+@keyframes indeterminate {
+  0% {
+    left: -50%;
+  }
+  100% {
+    left: 100%;
+  }
+}

@@ -1,0 +1,629 @@
+.projectsSection {
+  padding: 4rem 0;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #000000, #111827);
+}
+
+.container {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #3b82f6, #06b6d4, #10b981);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #d1d5db;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.filtersContainer {
+  margin-bottom: 2rem;
+}
+
+.filterRow {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .filterRow {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: rgba(31, 41, 55, 0.5);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  color: #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  background-color: rgba(55, 65, 81, 0.5);
+}
+
+.sortContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sortLabel {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.sortSelect {
+  background-color: rgba(31, 41, 55, 0.5);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  color: #e5e7eb;
+}
+
+.filtersPanel {
+  background-color: rgba(31, 41, 55, 0.3);
+  backdrop-filter: blur(8px);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .filtersGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #d1d5db;
+  margin-bottom: 0.5rem;
+}
+
+.filterSelect {
+  width: 100%;
+  background-color: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(75, 85, 99, 0.8);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  color: #e5e7eb;
+}
+
+.projectsCount {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin-bottom: 1.5rem;
+}
+
+.projectsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .projectsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.projectCard {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: rgba(17, 24, 39, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(55, 65, 81, 0.8);
+  transition: all 0.3s ease;
+}
+
+.projectCard:hover {
+  border-color: rgba(75, 85, 99, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.cardContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .cardHeader {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.categoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  background-color: rgba(31, 41, 55, 0.8);
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  margin-bottom: 0.5rem;
+}
+
+.priorityBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  margin-left: 0.5rem;
+}
+
+.highPriority {
+  background: linear-gradient(to right, #ef4444, #dc2626);
+}
+
+.mediumPriority {
+  background: linear-gradient(to right, #f59e0b, #d97706);
+}
+
+.lowPriority {
+  background: linear-gradient(to right, #10b981, #059669);
+}
+
+.projectTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .projectTitle {
+    font-size: 1.5rem;
+  }
+}
+
+.projectDescription {
+  font-size: 0.875rem;
+  color: #d1d5db;
+}
+
+.projectImage {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.progressSection {
+  margin-top: 0.5rem;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.progressText {
+  color: #9ca3af;
+}
+
+.progressValue {
+  font-weight: 600;
+}
+
+.highValue {
+  color: #ef4444;
+}
+
+.mediumValue {
+  color: #f59e0b;
+}
+
+.lowValue {
+  color: #10b981;
+}
+
+.progressBar {
+  height: 0.5rem;
+  background-color: rgba(31, 41, 55, 0.8);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.highFill {
+  background: linear-gradient(to right, #ef4444, #dc2626);
+}
+
+.mediumFill {
+  background: linear-gradient(to right, #f59e0b, #d97706);
+}
+
+.lowFill {
+  background: linear-gradient(to right, #10b981, #059669);
+}
+
+.shimmerEffect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmerEffect::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.timelineInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.timelineItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #d1d5db;
+  background-color: rgba(31, 41, 55, 0.8);
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.expandedContent {
+  border-top: 1px solid rgba(75, 85, 99, 0.5);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.expandedSection {
+  margin-bottom: 1.5rem;
+}
+
+.expandedTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #d1d5db;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.challengesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.challengeItem {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.challengeBullet {
+  color: #ef4444;
+  margin-right: 0.25rem;
+}
+
+.updatesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.updateItem {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.updateDate {
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.updateText {
+  color: #d1d5db;
+}
+
+.teamSection {
+  margin-top: 1rem;
+}
+
+.teamList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.teamMember {
+  font-size: 0.75rem;
+  background-color: rgba(31, 41, 55, 0.8);
+  color: #d1d5db;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.resourcesSection {
+  margin-top: 1rem;
+}
+
+.resourcesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.resourceLink {
+  font-size: 0.75rem;
+  background-color: rgba(31, 41, 55, 0.8);
+  color: #3b82f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  transition: color 0.2s ease;
+}
+
+.resourceLink:hover {
+  color: #60a5fa;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .actionsContainer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.expandButton {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background-color: rgba(31, 41, 55, 0.5);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  color: #e5e7eb;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .expandButton {
+    width: auto;
+  }
+}
+
+.expandButton:hover {
+  background-color: rgba(55, 65, 81, 0.5);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .actionButtons {
+    width: auto;
+  }
+}
+
+.ghostButton {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d1d5db;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .ghostButton {
+    width: auto;
+  }
+}
+
+.ghostButton:hover {
+  background-color: rgba(31, 41, 55, 0.8);
+  color: white;
+}
+
+.primaryButton {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+  color: white;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .primaryButton {
+    width: auto;
+  }
+}
+
+.primaryButton:hover {
+  background: linear-gradient(to right, #1d4ed8, #4338ca);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 0;
+  background-color: rgba(31, 41, 55, 0.2);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.emptyIcon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  color: #6b7280;
+}
+
+.emptyTitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #d1d5db;
+  margin-bottom: 0.5rem;
+}
+
+.emptyText {
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.resetButton {
+  display: inline-flex;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: rgba(31, 41, 55, 0.5);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  color: #e5e7eb;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.resetButton:hover {
+  background-color: rgba(55, 65, 81, 0.5);
+}
+
+.backgroundParticle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(79, 70, 229, 0.1);
+  z-index: 0;
+}

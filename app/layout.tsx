@@ -213,7 +213,9 @@ export default function RootLayout({
         </ThemeProvider>
         <RAGChatAssistant />
         {process.env.NODE_ENV === "development" && <CSSPerformanceMonitor />}
-        <Analytics />
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
         <Suspense fallback={null}>
           <ServiceWorkerRegistration />
         </Suspense>

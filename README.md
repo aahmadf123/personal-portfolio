@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Personal Portfolio
 
 A modern portfolio website built with Next.js, featuring project showcases, blog posts, and skill demonstrations. The site was originally hosted on Vercel and has been migrated to Netlify with Supabase for database and storage.
@@ -81,3 +82,6 @@ pnpm build
 ## Contact
 
 Feel free to reach out if you have any questions or suggestions!
+=======
+# Personal Website
+>>>>>>> fd62990f10ba9702a95356dc947b9cd36b1f39cd

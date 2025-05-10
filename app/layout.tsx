@@ -1,34 +1,50 @@
-import type React from "react"
-import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { Suspense, lazy } from "react"
-import { Favicon } from "./favicon"
-import { PerformanceProvider } from "@/contexts/performance-context"
-import Preload from "./preload"
-import { Analytics } from "@/components/analytics"
-import { ErrorBoundary } from "@/components/error-boundary"
-import { SeoSchema } from "@/components/seo-schema"
-import { RAGChatAssistant } from "@/components/rag-chat-assistant"
-import { CustomCursor } from "@/components/custom-cursor"
-import { CriticalCSSHead } from "@/components/critical-css-head"
-import { CSSPerformanceMonitor } from "@/components/css-performance-monitor"
-import { Header } from "@/components/header" // Import the Header component
+import type React from "react";
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Suspense, lazy } from "react";
+import { Favicon } from "./favicon";
+import { PerformanceProvider } from "@/contexts/performance-context";
+import Preload from "./preload";
+import { Analytics } from "@/components/analytics";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { SeoSchema } from "@/components/seo-schema";
+import { RAGChatAssistant } from "@/components/rag-chat-assistant";
+import { CustomCursor } from "@/components/custom-cursor";
+import { CriticalCSSHead } from "@/components/critical-css-head";
+import { CSSPerformanceMonitor } from "@/components/css-performance-monitor";
+import { Header } from "@/components/header"; // Import the Header component
+import dynamic from "next/dynamic";
+
+// Dynamic import the RouterProvider with no SSR to avoid hydration issues
+const RouterProvider = dynamic(
+  () =>
+    import("@/components/client-wrappers/router-provider").then(
+      (mod) => mod.RouterProvider
+    ),
+  { ssr: false }
+);
 
 // Import VisibleTechBackground directly to ensure it's loaded
-import { VisibleTechBackground } from "@/components/visible-tech-background"
+import { VisibleTechBackground } from "@/components/visible-tech-background";
 
 // Lazy load components that aren't needed for initial render
 const MicroInteractions = lazy(() =>
-  import("@/components/micro-interactions").then((mod) => ({ default: mod.MicroInteractions || (() => null) })),
-)
+  import("@/components/micro-interactions").then((mod) => ({
+    default: mod.MicroInteractions || (() => null),
+  }))
+);
 const ScrollAnimations = lazy(() =>
-  import("@/components/scroll-animations").then((mod) => ({ default: mod.ScrollAnimations || (() => null) })),
-)
+  import("@/components/scroll-animations").then((mod) => ({
+    default: mod.ScrollAnimations || (() => null),
+  }))
+);
 const ServiceWorkerRegistration = lazy(() =>
-  import("./service-worker-registration").then((mod) => ({ default: mod.ServiceWorkerRegistration })),
-)
+  import("./service-worker-registration").then((mod) => ({
+    default: mod.ServiceWorkerRegistration,
+  }))
+);
 
 // Optimize font loading with display swap
 const inter = Inter({
@@ -37,7 +53,7 @@ const inter = Inter({
   preload: true,
   fallback: ["system-ui", "sans-serif"],
   adjustFontFallback: true, // New in Next.js 14
-})
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -46,15 +62,18 @@ export const viewport: Viewport = {
   userScalable: true,
   themeColor: "#000000",
   colorScheme: "dark light", // Support both color schemes
-}
+};
 
 export const metadata: Metadata = {
   title: {
     template: "%s | Ahmad Firas",
     default: "Ahmad Firas - Portfolio",
   },
-  description: "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yourdomain.com"),
+  description:
+    "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "https://yourdomain.com"
+  ),
   alternates: {
     canonical: "/",
     languages: {
@@ -63,7 +82,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Ahmad Firas - Portfolio",
-    description: "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
+    description:
+      "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
     url: process.env.NEXT_PUBLIC_BASE_URL,
     siteName: "Ahmad Firas Portfolio",
     images: [
@@ -80,7 +100,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Ahmad Firas - Portfolio",
-    description: "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
+    description:
+      "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
     creator: "@ahmadfirasazfar",
     images: ["/professional-headshot.jpg"],
   },
@@ -98,8 +119,8 @@ export const metadata: Metadata = {
   verification: {
     google: "google-site-verification-code", // Replace with your verification code
   },
-    generator: 'v0.dev'
-}
+  generator: "v0.dev",
+};
 
 // Organization affiliations data
 const organizationAffiliations = [
@@ -124,12 +145,12 @@ const organizationAffiliations = [
     role: "Associate Member",
     period: "2021 - Present",
   },
-]
+];
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -138,7 +159,11 @@ export default function RootLayout({
         <Favicon />
         {/* Preconnect to domains for faster resource loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="stylesheet" href="/css/print.css" media="print" />
@@ -151,7 +176,8 @@ export default function RootLayout({
           profileImage="/professional-headshot.jpg"
           sameAs={[
             process.env.NEXT_PUBLIC_GITHUB_URL,
-            process.env.NEXT_PUBLIC_LINKEDIN_URL || "https://www.linkedin.com/in/ahmadfirasazfar",
+            process.env.NEXT_PUBLIC_LINKEDIN_URL ||
+              "https://www.linkedin.com/in/ahmadfirasazfar",
             process.env.NEXT_PUBLIC_TWITTER_URL,
           ]}
           jobTitle="Computer Science & Engineering Student"
@@ -162,18 +188,26 @@ export default function RootLayout({
         {/* Custom cursor component */}
         <CustomCursor />
         <Preload />
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
           <PerformanceProvider>
             <ErrorBoundary>
-              {/* Background with fallback */}
-              <VisibleTechBackground />
+              {/* Wrap the entire app with RouterProvider to ensure router is mounted */}
+              <RouterProvider>
+                {/* Background with fallback */}
+                <VisibleTechBackground />
 
-              {/* Content */}
-              <div className="relative z-10 flex flex-col min-h-screen">
-                {/* Add Header component here */}
-                <Header />
-                <main className="flex-grow">{children}</main>
-              </div>
+                {/* Content */}
+                <div className="relative z-10 flex flex-col min-h-screen">
+                  {/* Add Header component here */}
+                  <Header />
+                  <main className="flex-grow">{children}</main>
+                </div>
+              </RouterProvider>
             </ErrorBoundary>
           </PerformanceProvider>
         </ThemeProvider>
@@ -185,5 +219,5 @@ export default function RootLayout({
         </Suspense>
       </body>
     </html>
-  )
+  );
 }

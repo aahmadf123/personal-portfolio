@@ -1,13 +1,30 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isServerRoute } from "./app/server-routes.config";
 
 export function middleware(request: NextRequest) {
-  // Add any middleware logic here
+  const { pathname } = request.nextUrl;
+
+  // Check if this is a server route that needs special handling
+  if (isServerRoute(pathname)) {
+    // For known dynamic routes, ensure they're processed server-side
+    // by adding a special header that Netlify's Next.js plugin will recognize
+    const response = NextResponse.next();
+    response.headers.set("x-middleware-next", "server");
+    return response;
+  }
+
+  // For regular routes, proceed normally
   return NextResponse.next();
 }
 
+// Define paths that should be processed by the middleware
+// Include all the dynamic routes that were flagged in the error
 export const config = {
   matcher: [
-    // Skip all internal paths
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    // API routes that need special handling
+    "/api/:path*",
+    "/admin/:path*",
+    // Skip static assets
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

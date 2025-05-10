@@ -8,7 +8,17 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    domains: ["localhost", "your-project-id.supabase.co"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
-}
+  output: "standalone",
+};
 
-export default nextConfig
+export default nextConfig;

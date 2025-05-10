@@ -9,13 +9,12 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Handle rewrites and redirects
+# Handle Next.js static files
 [[redirects]]
-  from = "/*"
+  from = "/_next/static/*"
   to = "/_next/static/:splat"
   status = 200
   force = true
-  conditions = {Path = ["/_next/static/*"]}
 
 # Rewrite for Next.js API routes
 [[redirects]]

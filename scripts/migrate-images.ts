@@ -3,7 +3,7 @@
  *
  * Usage:
  * 1. Make sure .env has NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
- * 2. Run: ts-node scripts/migrate-images.ts
+ * 2. Run: npm run migrate-images
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -31,12 +31,48 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error(
-    "Missing Supabase environment variables. Make sure .env is properly set up."
+    "Missing Supabase environment variables. Make sure .env has NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY"
   );
   process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Create bucket if it doesn't exist
+async function ensureBucketExists() {
+  try {
+    // First check if bucket exists
+    const { data: buckets, error: getBucketsError } =
+      await supabase.storage.listBuckets();
+
+    if (getBucketsError) {
+      throw getBucketsError;
+    }
+
+    const bucketExists = buckets.some((bucket) => bucket.name === BUCKET_NAME);
+
+    if (!bucketExists) {
+      console.log(`Bucket "${BUCKET_NAME}" does not exist. Creating...`);
+      const { error: createBucketError } = await supabase.storage.createBucket(
+        BUCKET_NAME,
+        {
+          public: true,
+        }
+      );
+
+      if (createBucketError) {
+        throw createBucketError;
+      }
+
+      console.log(`Bucket "${BUCKET_NAME}" created successfully.`);
+    } else {
+      console.log(`Bucket "${BUCKET_NAME}" already exists.`);
+    }
+  } catch (error) {
+    console.error("Error ensuring bucket exists:", error);
+    throw error;
+  }
+}
 
 // Ensure temp directory exists
 if (!fs.existsSync(TEMP_DIR)) {
@@ -105,6 +141,9 @@ async function uploadToSupabaseStorage(
 async function migrateImages(): Promise<void> {
   try {
     console.log("Starting migration from Vercel Blob to Supabase Storage...");
+
+    // Ensure bucket exists before proceeding
+    await ensureBucketExists();
 
     // Load URLs from file if it exists
     let urls = DEFAULT_URLS;
@@ -209,6 +248,7 @@ async function migrateImages(): Promise<void> {
     console.log("\nMigration completed!");
   } catch (error) {
     console.error("Migration failed:", error);
+    process.exit(1);
   }
 }
 

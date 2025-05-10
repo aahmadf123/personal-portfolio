@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase";
+import { DEFAULT_BUCKET_NAME } from "./env-check";
 
 /**
  * Helper functions for handling storage with Supabase
  */
 
-const BUCKET_NAME = "portfolio-bucket";
+// Use environment variable with fallback through the centralized constant
+const BUCKET_NAME = DEFAULT_BUCKET_NAME;
 
 /**
  * Gets a public URL for a file in Supabase Storage
@@ -12,8 +14,13 @@ const BUCKET_NAME = "portfolio-bucket";
  * @returns Full public URL
  */
 export function getStorageUrl(path: string): string {
+  if (!path) return getPlaceholderImageUrl();
+
+  // Clean the path - remove leading slashes
+  const cleanPath = path.replace(/^\/+/, "");
+
   const supabase = createClient();
-  const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(path);
+  const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath);
   return data.publicUrl;
 }
 
@@ -26,10 +33,18 @@ export function getPlaceholderImageUrl(): string {
 
 /**
  * Transforms URLs from Vercel Blob to Supabase Storage
- * @param url - Original Vercel Blob URL
+ * @param url - Original URL
  * @returns URL to the resource in Supabase Storage
  */
 export function transformStorageUrl(url: string): string {
+  if (!url) return getPlaceholderImageUrl();
+
+  // Check if this is already a Supabase Storage URL
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (supabaseUrl && url.includes(supabaseUrl)) {
+    return url;
+  }
+
   // Check if this is a Vercel Blob URL
   if (url.includes("vercel-storage.com")) {
     try {
@@ -41,17 +56,24 @@ export function transformStorageUrl(url: string): string {
       }
 
       // Return the equivalent Supabase Storage URL
-      // For now returning placeholder until files are migrated
-      return getPlaceholderImageUrl();
-
-      // Once files are migrated, you can use:
-      // return getStorageUrl(`images/${filename}`);
+      return getStorageUrl(`images/${filename}`);
     } catch (error) {
       console.error("Error transforming storage URL:", error);
       return getPlaceholderImageUrl();
     }
   }
 
-  // Return the original URL if it's not a Vercel Blob URL
+  // Check if this is a relative path
+  if (url.startsWith("/")) {
+    // If it's a local file in the public directory, return as is
+    if (url.startsWith("/images/") || url.startsWith("/public/")) {
+      return url;
+    }
+
+    // Otherwise, assume it should be in storage and convert
+    return getStorageUrl(url.substring(1));
+  }
+
+  // Return the original URL for external URLs
   return url;
 }

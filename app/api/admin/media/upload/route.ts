@@ -1,70 +1,109 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerSupabaseClient } from "@/lib/supabase";
+import { nanoid } from "nanoid";
 
-const BUCKET_NAME = "portfolio-bucket";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+// Maximum file size (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const supabase = createClient();
-    const { data: authData } = await supabase.auth.getSession();
+    // Initialize Supabase client
+    const supabase = createServerSupabaseClient();
 
-    if (!authData.session) {
+    // Check authentication
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Get form data with the file
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const folder = (formData.get("folder") as string) || "uploads";
+    const contentType =
+      (formData.get("contentType") as string) ||
+      file?.type ||
+      "application/octet-stream";
+    const userId = session.session.user.id;
 
+    // Validate file exists
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Generate a unique filename
-    const timestamp = new Date().getTime();
-    const folder = "media";
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-");
-    const filename = `${folder}/${timestamp}-${originalName}`;
-
-    // Convert File to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(filename, arrayBuffer, {
-        contentType: file.type,
-        upsert: true,
-      });
-
-    if (error) {
-      console.error("Supabase storage upload error:", error);
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: error.message || "Failed to upload file" },
-        { status: 500 }
+        {
+          error: `File size exceeds maximum allowed size (10MB)`,
+        },
+        { status: 400 }
       );
     }
 
-    // Get the public URL for the uploaded file
-    const { data: urlData } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(filename);
+    // Generate a unique filename
+    const fileExtension = file.name.split(".").pop();
+    const uniqueFilename = `${nanoid()}.${fileExtension}`;
+    const filePath = `${folder}/${uniqueFilename}`;
 
-    return NextResponse.json({
-      id: filename,
-      url: urlData.publicUrl,
-      path: filename,
-      filename: originalName,
-      contentType: file.type,
-      size: file.size,
-      createdAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error("Error with storage:", error);
+    // Get file buffer
+    const fileBuffer = await file.arrayBuffer();
+
+    // Upload file to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from("media")
+      .upload(filePath, fileBuffer, {
+        contentType,
+        cacheControl: "3600",
+      });
+
+    if (error) {
+      console.error("Error uploading file to Supabase Storage:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Get public URL for the file
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("media").getPublicUrl(data.path);
+
+    // Store metadata in the media_metadata table
+    const { error: metadataError } = await supabase
+      .from("media_metadata")
+      .insert({
+        blob_id: data.path,
+        metadata: {
+          filename: file.name,
+          size: file.size,
+          contentType,
+          uploadedBy: userId,
+          originalName: file.name,
+        },
+      });
+
+    if (metadataError) {
+      console.error("Error storing file metadata:", metadataError);
+      // Continue even if metadata storage fails
+    }
+
+    // Return the file information
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Storage service error",
+        url: publicUrl,
+        path: data.path,
+        name: file.name,
+        size: file.size,
+        type: contentType,
       },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    return NextResponse.json(
+      { error: "An unexpected error occurred while uploading the file" },
       { status: 500 }
     );
   }

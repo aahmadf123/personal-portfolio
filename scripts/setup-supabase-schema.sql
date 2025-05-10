@@ -2,10 +2,33 @@
 DROP FUNCTION IF EXISTS match_vectors CASCADE;
 DROP FUNCTION IF EXISTS update_updated_at CASCADE;
 
+-- Helper to check if extension exists
+CREATE OR REPLACE FUNCTION extension_exists(ext_name TEXT) RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM pg_extension WHERE extname = ext_name
+  );
+END;
+$$ LANGUAGE plpgsql;
 
 -- Enable extensions
-CREATE EXTENSION IF NOT EXISTS vector;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+DO $$ 
+BEGIN 
+  IF NOT extension_exists('uuid-ossp') THEN
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+  END IF;
+  
+  -- Only try to create vector extension if available (requires Supabase Enterprise)
+  IF extension_exists('pg_available_extensions') THEN 
+    IF EXISTS (
+      SELECT 1 FROM pg_available_extensions WHERE name = 'vector'
+    ) THEN
+      CREATE EXTENSION IF NOT EXISTS vector;
+    ELSE
+      RAISE NOTICE 'Vector extension not available on this Supabase tier, vector search will be unavailable';
+    END IF;
+  END IF;
+END $$;
 
 -- Timestamp auto-update function
 CREATE OR REPLACE FUNCTION update_updated_at()
@@ -15,6 +38,60 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Create a simpler alternative to pgvector when not available
+DO $$ 
+BEGIN
+  IF NOT extension_exists('vector') THEN
+    CREATE TABLE IF NOT EXISTS vector_store_fallback (
+      id SERIAL PRIMARY KEY,
+      reference_id TEXT NOT NULL,
+      content TEXT NOT NULL,
+      metadata JSONB,
+      embedding TEXT, -- Store as base64 encoded text
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+    
+    -- Create a function that will serve as a simplified version for text similarity
+    CREATE OR REPLACE FUNCTION text_similarity(query TEXT, content TEXT)
+    RETURNS FLOAT AS $$
+    DECLARE
+      words_a TEXT[];
+      words_b TEXT[];
+      common_count INTEGER := 0;
+      total_unique_words INTEGER;
+    BEGIN
+      -- Simple word tokenization and matching for text similarity
+      words_a := regexp_split_to_array(lower(query), '\\s+');
+      words_b := regexp_split_to_array(lower(content), '\\s+');
+      
+      -- Count common words
+      SELECT COUNT(*) INTO common_count
+      FROM (
+        SELECT unnest(words_a) AS word
+        INTERSECT
+        SELECT unnest(words_b) AS word
+      ) common_words;
+      
+      -- Count total unique words
+      SELECT COUNT(*) INTO total_unique_words
+      FROM (
+        SELECT unnest(words_a) AS word
+        UNION
+        SELECT unnest(words_b) AS word
+      ) all_words;
+      
+      -- Return Jaccard similarity: intersection / union
+      IF total_unique_words = 0 THEN
+        RETURN 0;
+      ELSE
+        RETURN common_count::FLOAT / total_unique_words::FLOAT;
+      END IF;
+    END;
+    $$ LANGUAGE plpgsql IMMUTABLE;
+  END IF;
+END $$;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -389,4 +466,138 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_media_metadata_updated_at') THEN
     CREATE TRIGGER update_media_metadata_updated_at BEFORE UPDATE ON media_metadata FOR EACH ROW EXECUTE FUNCTION update_updated_at();
   END IF;
-END $$; 
+END $$;
+
+-- Create function for transactional project creation
+CREATE OR REPLACE FUNCTION create_project_with_relations(
+  project_data JSONB,
+  technologies_data JSONB DEFAULT '[]',
+  tags_data JSONB DEFAULT '[]',
+  challenges_data JSONB DEFAULT '[]',
+  milestones_data JSONB DEFAULT '[]',
+  images_data JSONB DEFAULT '[]'
+) RETURNS JSONB AS $$
+DECLARE
+  new_project_id INTEGER;
+  tech_record JSONB;
+  tag_record JSONB;
+  challenge_record JSONB;
+  milestone_record JSONB;
+  image_record JSONB;
+  result JSONB;
+BEGIN
+  -- Start a transaction
+  BEGIN
+    -- Insert the project and get its ID
+    INSERT INTO projects (
+      title, slug, description, details, summary, 
+      thumbnail_url, main_image_url, github_url, demo_url, video_url,
+      start_date, end_date, is_featured, is_ongoing, status, 
+      order_index, client, created_at, updated_at
+    ) VALUES (
+      project_data->>'title',
+      project_data->>'slug',
+      project_data->>'description',
+      project_data->>'details',
+      project_data->>'summary',
+      project_data->>'thumbnail_url',
+      project_data->>'main_image_url',
+      project_data->>'github_url',
+      project_data->>'demo_url',
+      project_data->>'video_url',
+      (project_data->>'start_date')::DATE,
+      (project_data->>'end_date')::DATE,
+      (project_data->>'is_featured')::BOOLEAN,
+      (project_data->>'is_ongoing')::BOOLEAN,
+      project_data->>'status',
+      COALESCE((project_data->>'order_index')::INTEGER, 0),
+      project_data->>'client',
+      NOW(),
+      NOW()
+    ) RETURNING id INTO new_project_id;
+    
+    -- Insert technologies
+    IF jsonb_array_length(technologies_data) > 0 THEN
+      FOR tech_record IN SELECT * FROM jsonb_array_elements(technologies_data) LOOP
+        INSERT INTO project_technologies (project_id, name, icon, category)
+        VALUES (
+          new_project_id,
+          tech_record->>'name',
+          tech_record->>'icon',
+          tech_record->>'category'
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert tags
+    IF jsonb_array_length(tags_data) > 0 THEN
+      FOR tag_record IN SELECT * FROM jsonb_array_elements(tags_data) LOOP
+        INSERT INTO project_tags (project_id, name)
+        VALUES (
+          new_project_id,
+          tag_record->>'name'
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert challenges
+    IF jsonb_array_length(challenges_data) > 0 THEN
+      FOR challenge_record IN SELECT * FROM jsonb_array_elements(challenges_data) LOOP
+        INSERT INTO project_challenges (project_id, title, description, solution)
+        VALUES (
+          new_project_id,
+          challenge_record->>'title',
+          challenge_record->>'description',
+          challenge_record->>'solution'
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert milestones
+    IF jsonb_array_length(milestones_data) > 0 THEN
+      FOR milestone_record IN SELECT * FROM jsonb_array_elements(milestones_data) LOOP
+        INSERT INTO project_milestones (project_id, title, description, date, status)
+        VALUES (
+          new_project_id,
+          milestone_record->>'title',
+          milestone_record->>'description',
+          (milestone_record->>'date')::DATE,
+          COALESCE(milestone_record->>'status', 'completed')
+        );
+      END LOOP;
+    END IF;
+    
+    -- Insert images
+    IF jsonb_array_length(images_data) > 0 THEN
+      FOR image_record IN SELECT * FROM jsonb_array_elements(images_data) LOOP
+        INSERT INTO project_images (project_id, url, alt_text, caption, order_index)
+        VALUES (
+          new_project_id,
+          image_record->>'url',
+          image_record->>'alt_text',
+          image_record->>'caption',
+          COALESCE((image_record->>'order_index')::INTEGER, 0)
+        );
+      END LOOP;
+    END IF;
+    
+    -- Return success with project ID
+    result := jsonb_build_object(
+      'success', true,
+      'project_id', new_project_id,
+      'message', 'Project created successfully'
+    );
+    
+    RETURN result;
+  EXCEPTION WHEN OTHERS THEN
+    -- Handle errors and return an error object
+    result := jsonb_build_object(
+      'success', false,
+      'error', SQLERRM,
+      'message', 'Failed to create project: ' || SQLERRM
+    );
+    
+    RETURN result;
+  END;
+END;
+$$ LANGUAGE plpgsql; 

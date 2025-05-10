@@ -11,9 +11,18 @@ import { transformStorageUrl } from "./storage-utils";
 // Projects
 export async function getProjects(): Promise<Project[]> {
   const supabase = createClient();
+
+  // Use a more efficient query pattern with proper foreign key relationships
   const { data, error } = await supabase
     .from("projects")
-    .select("*, project_technologies(*), project_tags(*), project_images(*)")
+    .select(
+      `
+      *,
+      project_technologies(id, name, icon, category),
+      project_tags(id, name),
+      project_images(id, url, alt_text, caption, order_index)
+    `
+    )
     .order("order_index", { ascending: true });
 
   if (error) {
@@ -21,40 +30,70 @@ export async function getProjects(): Promise<Project[]> {
     throw error;
   }
 
+  if (!data || !Array.isArray(data)) {
+    return [];
+  }
+
   // Process image URLs and transform data to match expected Project type
-  return data.map((project) => ({
-    ...project,
-    id: project.id.toString(),
-    image_url: transformStorageUrl(
-      project.main_image_url || project.thumbnail_url
-    ),
-    technologies: project.project_technologies
-      ? project.project_technologies.map((tech: any) => tech.name)
-      : [],
-    tags: project.project_tags
-      ? project.project_tags.map((tag: any) => tag.name)
-      : [],
-    images: project.project_images
-      ? project.project_images.map((img: any) => ({
-          url: transformStorageUrl(img.url),
-          alt: img.alt_text || project.title,
-          caption: img.caption || "",
-        }))
-      : [],
-    featured: project.is_featured,
-    completion:
-      project.status === "completed"
-        ? 100
-        : project.status === "in-progress"
-        ? 50
-        : project.status === "planned"
-        ? 0
-        : 75,
-  }));
+  return data.map((project) => {
+    try {
+      return {
+        ...project,
+        id: project.id.toString(),
+        image_url:
+          project.main_image_url || project.thumbnail_url
+            ? transformStorageUrl(
+                project.main_image_url || project.thumbnail_url
+              )
+            : null,
+        technologies: Array.isArray(project.project_technologies)
+          ? project.project_technologies.map((tech: any) => tech.name)
+          : [],
+        tags: Array.isArray(project.project_tags)
+          ? project.project_tags.map((tag: any) => tag.name)
+          : [],
+        images: Array.isArray(project.project_images)
+          ? project.project_images.map((img: any) => ({
+              url: img.url ? transformStorageUrl(img.url) : null,
+              alt: img.alt_text || project.title,
+              caption: img.caption || "",
+            }))
+          : [],
+        featured: project.is_featured || false,
+        completion:
+          project.status === "completed"
+            ? 100
+            : project.status === "in-progress"
+            ? 50
+            : project.status === "planned"
+            ? 0
+            : 75,
+      };
+    } catch (err) {
+      console.error(`Error processing project data for ID ${project.id}:`, err);
+      // Return basic project data if processing failed
+      return {
+        ...project,
+        id: project.id.toString(),
+        image_url: null,
+        technologies: [],
+        tags: [],
+        images: [],
+        featured: false,
+        completion: 0,
+      };
+    }
+  });
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   const supabase = createClient();
+
+  if (!slug) {
+    console.error("Project slug is required");
+    return null;
+  }
+
   const { data, error } = await supabase
     .from("projects")
     .select(
@@ -77,36 +116,56 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 
   if (!data) return null;
 
-  // Process image URLs and transform data
-  return {
-    ...data,
-    id: data.id.toString(),
-    image_url: transformStorageUrl(data.main_image_url || data.thumbnail_url),
-    technologies: data.project_technologies
-      ? data.project_technologies.map((tech: any) => tech.name)
-      : [],
-    tags: data.project_tags
-      ? data.project_tags.map((tag: any) => tag.name)
-      : [],
-    challenges: data.project_challenges || [],
-    milestones: data.project_milestones || [],
-    images: data.project_images
-      ? data.project_images.map((img: any) => ({
-          url: transformStorageUrl(img.url),
-          alt: img.alt_text || data.title,
-          caption: img.caption || "",
-        }))
-      : [],
-    featured: data.is_featured,
-    completion:
-      data.status === "completed"
-        ? 100
-        : data.status === "in-progress"
-        ? 50
-        : data.status === "planned"
-        ? 0
-        : 75,
-  };
+  try {
+    // Process image URLs and transform data
+    return {
+      ...data,
+      id: data.id.toString(),
+      image_url:
+        data.main_image_url || data.thumbnail_url
+          ? transformStorageUrl(data.main_image_url || data.thumbnail_url)
+          : null,
+      technologies: data.project_technologies
+        ? data.project_technologies.map((tech: any) => tech.name)
+        : [],
+      tags: data.project_tags
+        ? data.project_tags.map((tag: any) => tag.name)
+        : [],
+      challenges: data.project_challenges || [],
+      milestones: data.project_milestones || [],
+      images: data.project_images
+        ? data.project_images.map((img: any) => ({
+            url: img.url ? transformStorageUrl(img.url) : null,
+            alt: img.alt_text || data.title,
+            caption: img.caption || "",
+          }))
+        : [],
+      featured: data.is_featured || false,
+      completion:
+        data.status === "completed"
+          ? 100
+          : data.status === "in-progress"
+          ? 50
+          : data.status === "planned"
+          ? 0
+          : 75,
+    };
+  } catch (err) {
+    console.error(`Error processing project data for slug ${slug}:`, err);
+    // Return partial data if processing failed
+    return {
+      ...data,
+      id: data.id.toString(),
+      image_url: null,
+      technologies: [],
+      tags: [],
+      challenges: [],
+      milestones: [],
+      images: [],
+      featured: false,
+      completion: 0,
+    };
+  }
 }
 
 export async function getFeaturedProjects(): Promise<Project[]> {
@@ -264,6 +323,12 @@ export async function getBlogPosts(limit?: number) {
 
 export async function getBlogPostBySlug(slug: string) {
   const supabase = createClient();
+
+  if (!slug) {
+    console.error("Blog post slug is required");
+    return null;
+  }
+
   const { data, error } = await supabase
     .from("blog_posts")
     .select(
@@ -286,19 +351,32 @@ export async function getBlogPostBySlug(slug: string) {
 
   if (!data) return null;
 
-  // Process data and extract tags
-  const tags = data.blog_post_tags
-    ? data.blog_post_tags.map((postTag: any) => postTag.blog_tags)
-    : [];
+  try {
+    // Process data and extract tags
+    const tags = data.blog_post_tags
+      ? data.blog_post_tags.map((postTag: any) => postTag.blog_tags)
+      : [];
 
-  return {
-    ...data,
-    cover_image: transformStorageUrl(data.image_url),
-    summary: data.excerpt,
-    tags: tags,
-    category: data.categories,
-    read_time: data.read_time ? `${data.read_time} min read` : "5 min read",
-  };
+    return {
+      ...data,
+      cover_image: data.image_url ? transformStorageUrl(data.image_url) : null,
+      summary: data.excerpt || "",
+      tags: tags,
+      category: data.categories,
+      read_time: data.read_time ? `${data.read_time} min read` : "5 min read",
+    };
+  } catch (err) {
+    console.error(`Error processing blog post data for slug ${slug}:`, err);
+    // Return partial data if processing failed
+    return {
+      ...data,
+      cover_image: null,
+      summary: data.excerpt || "",
+      tags: [],
+      category: null,
+      read_time: "5 min read",
+    };
+  }
 }
 
 // Timeline

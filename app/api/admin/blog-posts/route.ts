@@ -1,78 +1,219 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createServerSupabaseClient } from "@/lib/supabase"
+import { NextRequest, NextResponse } from "next/server";
+import { createServerSupabaseClient } from "@/lib/supabase";
 
+// Fetch all blog posts for admin
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient()
+    // Initialize Supabase client
+    const supabase = createServerSupabaseClient();
 
-    // Get query parameters
-    const url = new URL(request.url)
-    const limit = Number.parseInt(url.searchParams.get("limit") || "100")
-    const featured = url.searchParams.get("featured") === "true"
-    const published = url.searchParams.get("published") === "true"
-
-    // Build query
-    let query = supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).limit(limit)
-
-    // Apply filters if provided
-    if (url.searchParams.has("featured")) {
-      query = query.eq("featured", featured)
+    // Check authentication
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (url.searchParams.has("published")) {
-      query = query.eq("published", published)
-    }
-
-    const { data, error } = await query
+    // Fetch blog posts with related data
+    const { data: posts, error } = await supabase
+      .from("blog_posts")
+      .select(
+        `
+        *,
+        categories(*),
+        blog_post_tags(
+          blog_tags(*)
+        )
+      `
+      )
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching blog posts:", error)
-      return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 })
+      console.error("Error fetching blog posts:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data)
+    // Transform data for frontend
+    const transformedPosts = posts.map((post) => {
+      // Extract tags from the nested structure
+      const tags = post.blog_post_tags
+        ? post.blog_post_tags.map((tag: any) => tag.blog_tags)
+        : [];
+
+      return {
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt,
+        image_url: post.image_url,
+        published: post.published,
+        featured: post.featured,
+        read_time: post.read_time,
+        view_count: post.view_count || 0,
+        category: post.categories,
+        tags: tags,
+        created_at: post.created_at,
+        updated_at: post.updated_at,
+      };
+    });
+
+    return NextResponse.json(transformedPosts);
   } catch (error) {
-    console.error("Error in blog posts API:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { error: "An unexpected error occurred" },
+      { status: 500 }
+    );
   }
 }
 
+// Create a new blog post
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient()
-    const postData = await request.json()
+    const body = await request.json();
 
-    // Extract tags if present
-    const tags = postData.tags || []
-    delete postData.tags
+    // Initialize Supabase client
+    const supabase = createServerSupabaseClient();
 
-    // Insert the blog post
-    const { data, error } = await supabase.from("blog_posts").insert(postData).select()
-
-    if (error) {
-      console.error("Error creating blog post:", error)
-      return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 })
+    // Check authentication
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // If we have tags, add them to the blog_post_tags table
-    if (tags.length > 0 && data && data.length > 0) {
-      const postId = data[0].id
+    // Extract fields for new post
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      image_url,
+      read_time,
+      published = false,
+      featured = false,
+      category_id = null,
+      tags = [],
+      ...otherFields
+    } = body;
 
-      const tagMappings = tags.map((tagId: number) => ({
-        blog_post_id: postId,
-        tag_id: tagId,
-      }))
+    // Validate required fields
+    if (!title || !slug || !excerpt || !content) {
+      return NextResponse.json(
+        {
+          error: "Title, slug, excerpt, and content are required",
+        },
+        { status: 400 }
+      );
+    }
 
-      const { error: tagError } = await supabase.from("blog_post_tags").insert(tagMappings)
+    // Check if slug already exists
+    const { data: existingPost, error: checkError } = await supabase
+      .from("blog_posts")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
 
-      if (tagError) {
-        console.error("Error adding tags to blog post:", tagError)
+    if (existingPost) {
+      return NextResponse.json(
+        {
+          error: "A blog post with this slug already exists",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Get user ID for author
+    const author_id = session.session.user.id;
+
+    // Create the blog post record
+    const postData = {
+      title,
+      slug,
+      excerpt,
+      content,
+      image_url,
+      read_time,
+      published,
+      featured,
+      category_id,
+      author_id,
+      ...otherFields,
+    };
+
+    const { data: newPost, error: createError } = await supabase
+      .from("blog_posts")
+      .insert(postData)
+      .select();
+
+    if (createError) {
+      console.error("Error creating blog post:", createError);
+      return NextResponse.json({ error: createError.message }, { status: 500 });
+    }
+
+    const postId = newPost[0].id;
+
+    // Handle tags
+    if (tags.length > 0) {
+      // First, make sure all tags exist in the blog_tags table
+      for (const tagName of tags) {
+        // Get or create the tag
+        const slug = tagName.toLowerCase().replace(/\s+/g, "-");
+
+        // Check if tag exists
+        const { data: existingTag, error: tagCheckError } = await supabase
+          .from("blog_tags")
+          .select("id")
+          .eq("name", tagName)
+          .maybeSingle();
+
+        if (tagCheckError) {
+          console.error("Error checking tag:", tagCheckError);
+          continue;
+        }
+
+        // If tag doesn't exist, create it
+        let tagId;
+
+        if (!existingTag) {
+          const { data: newTag, error: tagCreateError } = await supabase
+            .from("blog_tags")
+            .insert({
+              name: tagName,
+              slug: slug,
+              description: `Posts tagged with ${tagName}`,
+            })
+            .select();
+
+          if (tagCreateError) {
+            console.error("Error creating tag:", tagCreateError);
+            continue;
+          }
+
+          tagId = newTag[0].id;
+        } else {
+          tagId = existingTag.id;
+        }
+
+        // Create the blog_post_tags relationship
+        await supabase.from("blog_post_tags").insert({
+          blog_post_id: postId,
+          tag_id: tagId,
+        });
       }
     }
 
-    return NextResponse.json(data[0])
+    return NextResponse.json(
+      {
+        message: "Blog post created successfully",
+        id: postId,
+        slug,
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Error in create blog post API:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { error: "An unexpected error occurred" },
+      { status: 500 }
+    );
   }
 }

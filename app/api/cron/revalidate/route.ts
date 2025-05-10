@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic"; // Make this route dynamic
+export const runtime = "edge"; // Use edge runtime instead of Node.js
 
 // This endpoint will be called by a scheduled task
 export async function GET(request: NextRequest) {
@@ -44,8 +45,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-// Runtime configuration
-export const config = {
-  runtime: "edge",
-};

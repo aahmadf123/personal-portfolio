@@ -1,30 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image, { type ImageProps } from "next/image"
+import { useState } from "react";
+import Image from "next/image";
 
-interface FallbackImageProps extends Omit<ImageProps, "onError"> {
-  fallbackSrc?: string
-  onError?: () => void
+interface FallbackImageProps {
+  src: string;
+  alt: string;
+  fill?: boolean;
+  className?: string;
+  priority?: boolean;
 }
 
 export function FallbackImage({
   src,
   alt,
-  fallbackSrc = "/broken-image-icon.png",
-  onError,
-  ...props
+  fill,
+  className,
+  priority,
 }: FallbackImageProps) {
-  const [imgSrc, setImgSrc] = useState(src)
-  const [hasErrored, setHasErrored] = useState(false)
+  const [imgSrc, setImgSrc] = useState(src);
 
-  const handleError = () => {
-    if (!hasErrored) {
-      setImgSrc(fallbackSrc)
-      setHasErrored(true)
-      if (onError) onError()
-    }
-  }
-
-  return <Image {...props} src={imgSrc || "/placeholder.svg"} alt={alt} onError={handleError} />
+  return (
+    <Image
+      src={imgSrc || "/placeholder.svg"}
+      alt={alt}
+      fill={fill}
+      className={className}
+      priority={priority}
+      onError={() => setImgSrc("/broken-image-icon.png")}
+    />
+  );
 }

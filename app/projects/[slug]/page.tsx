@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -24,6 +21,7 @@ import { ProjectTimeline } from "./project-timeline";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { Separator } from "@/components/ui/separator";
 import { RelatedProjects } from "./related-projects";
+import { FallbackImage } from "@/components/fallback-image";
 
 type Props = {
   params: { slug: string };
@@ -55,30 +53,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       project.summary ||
       `Details about ${project.title}`,
   };
-}
-
-interface FallbackImageProps {
-  src: string;
-  alt: string;
-  fill?: boolean;
-  className?: string;
-  priority?: boolean;
-}
-
-// Create a client component to handle image loading fallback
-function FallbackImage({ src, alt, fill, className, priority }: FallbackImageProps) {
-  const [imgSrc, setImgSrc] = useState(src);
-
-  return (
-    <Image
-      src={imgSrc}
-      alt={alt}
-      fill={fill}
-      className={className}
-      priority={priority}
-      onError={() => setImgSrc("/broken-image-icon.png")}
-    />
-  );
 }
 
 export default async function ProjectPage({ params }: Props) {

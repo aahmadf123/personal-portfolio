@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getFeaturedProjects } from "@/lib/project-service";
-import { revalidateTag } from "next/cache";
 
 // Set short revalidation time for dynamic data
 export const revalidate = 60; // Revalidate every 60 seconds
@@ -19,9 +18,12 @@ export async function GET(request: Request) {
     // Use a fixed limit for static generation
     // In Netlify static builds, we'll just use default limit=3
     let limit = 3;
-    
+
     // Only try to parse URL in dynamic contexts
-    if (process.env.NODE_ENV !== 'production' || process.env.NETLIFY !== 'true') {
+    if (
+      process.env.NODE_ENV !== "production" ||
+      process.env.NETLIFY !== "true"
+    ) {
       try {
         const url = new URL(request.url);
         const limitParam = url.searchParams.get("limit");
@@ -36,9 +38,7 @@ export async function GET(request: Request) {
     // Get featured projects using project-service to maintain consistency
     const featuredProjects = await getFeaturedProjects(limit);
 
-    // Add a cache tag for revalidation
-    revalidateTag("projects");
-
+    // Cache headers work better for static generation than revalidateTag
     return NextResponse.json(featuredProjects, {
       headers: {
         "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",

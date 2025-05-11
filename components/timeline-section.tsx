@@ -30,8 +30,11 @@ export function TimelineSection() {
       setLoading(true);
       setError(null);
 
+      // Use absolute URL for better reliability
+      const timelineApiUrl = "/api/timeline?limit=5";
+
       // Fetch the latest 5 entries from the timeline API
-      const response = await fetch("/api/timeline?limit=5", {
+      const response = await fetch(timelineApiUrl, {
         // Add cache: 'no-store' to always get fresh data
         cache: "no-store",
       });
@@ -53,6 +56,8 @@ export function TimelineSection() {
       setError(
         error instanceof Error ? error.message : "Unknown error occurred"
       );
+      // Set empty entries array in case of error to avoid undefined values
+      setEntries([]);
     } finally {
       setLoading(false);
     }

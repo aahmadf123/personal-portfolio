@@ -5,7 +5,27 @@ import { transformStorageUrl } from "@/lib/storage-utils";
  * API route to transform a URL for testing
  * GET /api/debug/transform-url?url=your-url-here
  */
+
+// Make this API route dynamic (not statically generated)
+export const dynamic = "force-dynamic";
+
+// For Netlify static builds, generate a stub response
+export const generateStaticParams = async () => {
+  // This route doesn't make sense to pre-render, but we need to
+  // provide a valid response for static builds
+  return [{}];
+};
+
 export async function GET(request: NextRequest) {
+  // For static builds, return a pre-defined response
+  if (process.env.NETLIFY === "true" && process.env.CONTEXT === "production") {
+    return NextResponse.json({
+      success: true,
+      message: "Static build - transformations happen at runtime",
+      note: "This is a pre-rendered response. The actual URL transformation occurs at runtime.",
+    });
+  }
+
   try {
     // Get the URL from query parameters
     const url = request.nextUrl.searchParams.get("url");

@@ -5,21 +5,35 @@ import { revalidateTag } from "next/cache";
 // Set short revalidation time for dynamic data
 export const revalidate = 60; // Revalidate every 60 seconds
 
-// Generate static params for just the default case
+// Generate static params for the default case and a couple common limits
 export const generateStaticParams = async () => {
-  return [{}]; // Default params with no limit
+  return [
+    {}, // Default params (limit=3)
+    { limit: "4" },
+    { limit: "6" },
+  ];
 };
 
 export async function GET(request: Request) {
   try {
-    // Extract limit from query string if needed
-    const url = new URL(request.url);
-    const limit = url.searchParams.get("limit")
-      ? parseInt(url.searchParams.get("limit") as string, 10)
-      : 3;
+    // Use a fixed limit for static generation
+    // In Netlify static builds, we'll just use default limit=3
+    let limit = 3;
+    
+    // Only try to parse URL in dynamic contexts
+    if (process.env.NODE_ENV !== 'production' || process.env.NETLIFY !== 'true') {
+      try {
+        const url = new URL(request.url);
+        const limitParam = url.searchParams.get("limit");
+        if (limitParam) {
+          limit = parseInt(limitParam, 10);
+        }
+      } catch (e) {
+        console.warn("URL parsing skipped in static build context");
+      }
+    }
 
     // Get featured projects using project-service to maintain consistency
-    // This ensures the same data source is used for both featured and all projects
     const featuredProjects = await getFeaturedProjects(limit);
 
     // Add a cache tag for revalidation

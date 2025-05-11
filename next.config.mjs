@@ -45,6 +45,7 @@ const nextConfig = {
   // Improve build process for Netlify
   swcMinify: true,
 
+  // Configure dynamic routes for Netlify build
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
     // Properly handle static chunks in App Router
@@ -56,8 +57,16 @@ const nextConfig = {
   env: {
     NETLIFY: process.env.NETLIFY,
   },
-  // Note: For static paths in App Router, use generateStaticParams in your page components
-  // instead of exportPathMap which is only for Pages Router
+
+  // Indicate which API routes should always be dynamic (not statically generated)
+  // This helps with the "Dynamic server usage" errors
+  serverRuntimeConfig: {
+    dynamicApiRoutes: [
+      "/api/debug/transform-url",
+      "/api/projects/featured",
+      "/api/admin/db-pool-stats",
+    ],
+  },
 };
 
 export default nextConfig;

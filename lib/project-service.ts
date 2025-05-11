@@ -28,6 +28,7 @@ function processProjectData(project: any): Project {
   const mainImageUrl = mainImage?.url || project.main_image_url || null;
 
   // Calculate image URL from existing fields
+  // Don't use image_url directly as it doesn't exist in the database
   const imageUrl = thumbnailUrl || mainImageUrl || null;
 
   // Process dates for consistent format
@@ -40,7 +41,7 @@ function processProjectData(project: any): Project {
     technologies,
     thumbnail_url: thumbnailUrl,
     main_image_url: mainImageUrl,
-    image_url: imageUrl,
+    image_url: imageUrl, // Computed field, not from database
     start_date: startDate ? startDate.toISOString() : null,
     end_date: endDate ? endDate.toISOString() : null,
     // Ensure these fields exist with defaults if needed
@@ -56,11 +57,15 @@ export async function getAllProjects(): Promise<Project[]> {
       const supabase = createServerSupabaseClient();
 
       // Use the Supabase client directly for better reliability
+      // Only select columns that exist in the database
       const { data, error } = await supabase
         .from("projects")
         .select(
           `
-          *,
+          id, title, slug, description, summary, content, 
+          github_url, demo_url, video_url, status, completion,
+          start_date, end_date, category, is_featured, priority, order_index,
+          thumbnail_url, main_image_url,
           project_tags (*),
           project_technologies (*),
           project_images (*)
@@ -88,11 +93,15 @@ export async function getFeaturedProjects(limit = 3): Promise<Project[]> {
       const supabase = createServerSupabaseClient();
 
       // Use the Supabase client directly for better reliability
+      // Only select columns that exist in the database
       const { data, error } = await supabase
         .from("projects")
         .select(
           `
-          *,
+          id, title, slug, description, summary, content, 
+          github_url, demo_url, video_url, status, completion,
+          start_date, end_date, category, is_featured, priority, order_index,
+          thumbnail_url, main_image_url,
           project_tags (*),
           project_technologies (*),
           project_images (*)
@@ -129,11 +138,15 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
       const supabase = createServerSupabaseClient();
 
       // Use the Supabase client directly for better reliability
+      // Only select columns that exist in the database
       const { data, error } = await supabase
         .from("projects")
         .select(
           `
-          *,
+          id, title, slug, description, summary, content, 
+          github_url, demo_url, video_url, status, completion,
+          start_date, end_date, category, is_featured, priority, order_index,
+          thumbnail_url, main_image_url,
           project_tags (*),
           project_technologies (*),
           project_images (*)

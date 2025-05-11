@@ -15,12 +15,10 @@ export const revalidate = 86400;
 
 async function getTimelineEntries() {
   try {
-    // Simplified URL approach to avoid URL constructor issues
-    const apiUrl = process.env.NEXT_PUBLIC_SITE_URL
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/timeline`
-      : "/api/timeline";
+    // Use a relative URL path for static builds
+    const apiUrl = "/api/timeline";
 
-    // Fetch timeline data from API using ISR (Incremental Static Regeneration)
+    // Fetch timeline data from API
     const res = await fetch(apiUrl, {
       next: { revalidate: 86400 }, // Use ISR with 24 hour revalidation
     });

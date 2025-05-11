@@ -17,10 +17,15 @@
   status = 200
   force = true
 
-# Rewrite for Next.js API routes - make this more specific for the routes that caused errors
+# Dynamic API routes
 [[redirects]]
   from = "/api/projects/*"
   to = "/.netlify/functions/nextjs-server/api/projects/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/research-projects/*"
+  to = "/.netlify/functions/nextjs-server/api/research-projects/:splat"
   status = 200
 
 [[redirects]]
@@ -38,9 +43,26 @@
   to = "/.netlify/functions/nextjs-server/api/github/:splat"
   status = 200
 
+# Admin routes
 [[redirects]]
   from = "/admin/*"
   to = "/.netlify/functions/nextjs-server/admin/:splat"
+  status = 200
+
+# Dynamic content pages
+[[redirects]]
+  from = "/projects/*"
+  to = "/.netlify/functions/nextjs-server/projects/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/blog/*"
+  to = "/.netlify/functions/nextjs-server/blog/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/research/*"
+  to = "/.netlify/functions/nextjs-server/research/:splat"
   status = 200
 
 # Rewrite for other API routes

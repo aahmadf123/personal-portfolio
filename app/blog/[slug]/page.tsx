@@ -1,27 +1,37 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import Image from "next/image"
-import Link from "next/link"
-import { notFound } from "next/navigation"
-import { getPostBySlug } from "@/lib/blog-service"
-import { formatDate } from "@/lib/utils"
-import Markdown from "react-markdown"
-import { ViewTracker } from "@/components/analytics/view-tracker"
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getPostBySlug, getAllBlogPosts } from "@/lib/blog-service";
+import { formatDate } from "@/lib/utils";
+import Markdown from "react-markdown";
+import { ViewTracker } from "@/components/analytics/view-tracker";
 
 interface BlogPostPageProps {
   params: {
-    slug: string
-  }
+    slug: string;
+  };
+}
+
+// Set a revalidation period for all blog pages (3 hours)
+export const revalidate = 10800;
+
+export async function generateStaticParams() {
+  const posts = await getAllBlogPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
-  const post = await getPostBySlug(params.slug)
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     return {
       title: "Post Not Found",
       description: "The requested blog post could not be found.",
-    }
+    };
   }
 
   return {
@@ -42,14 +52,14 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
         },
       ],
     },
-  }
+  };
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getPostBySlug(params.slug)
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -81,7 +91,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               )}
             </div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">{post.title}</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              {post.title}
+            </h1>
 
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8">
               <div className="flex items-center">
@@ -97,18 +109,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="flex items-center gap-4 mb-8">
               <div className="flex items-center gap-3">
                 <div className="relative h-10 w-10 rounded-full overflow-hidden">
-                  <Image src="/professional-headshot.png" alt="Author" fill className="object-cover" />
+                  <Image
+                    src="/professional-headshot.png"
+                    alt="Author"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div>
                   <div className="font-medium">Ahmad</div>
-                  <div className="text-xs text-muted-foreground">AI & Aerospace Engineer</div>
+                  <div className="text-xs text-muted-foreground">
+                    AI & Aerospace Engineer
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="relative h-[300px] md:h-[400px] lg:h-[500px] w-full rounded-lg overflow-hidden mb-8">
               <Image
-                src={post.image_url || "/placeholder.svg?height=800&width=1200&query=tech blog"}
+                src={
+                  post.image_url ||
+                  "/placeholder.svg?height=800&width=1200&query=tech blog"
+                }
                 alt={post.title}
                 fill
                 className="object-cover"
@@ -137,5 +159,5 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       <Footer />
     </main>
-  )
+  );
 }

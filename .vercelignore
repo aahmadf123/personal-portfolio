@@ -4,3 +4,5 @@ app/_not-found
 app/[...not_found]
 pages/404.js
 pages/_error.js
+# Note: Using generateStaticParams in page components with the App Router
+# instead of exportPathMap which is for Pages Router only

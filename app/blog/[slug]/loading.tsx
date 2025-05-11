@@ -1,52 +1,60 @@
 export default function BlogPostLoading() {
   return (
-    <div className="container mx-auto px-4 py-12 space-y-8">
-      {/* Post header */}
-      <div className="space-y-4 max-w-4xl mx-auto">
-        <div className="h-12 w-3/4 bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
+    <main className="min-h-screen bg-[#0a1218] text-white">
+      <div className="h-16 bg-[#0a1218] border-b border-gray-800"></div>
 
-        {/* Post metadata */}
-        <div className="flex gap-4">
-          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
+      <article className="py-16 md:py-24 animate-pulse">
+        <div className="container px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            {/* Back button skeleton */}
+            <div className="inline-flex items-center h-4 w-32 bg-gray-700 rounded mb-8"></div>
+
+            {/* Category skeleton */}
+            <div className="h-6 w-24 bg-gray-700 rounded-full mb-6"></div>
+
+            {/* Title skeleton */}
+            <div className="h-12 w-full bg-gray-700 rounded mb-6"></div>
+
+            {/* Metadata skeleton */}
+            <div className="flex items-center gap-4 h-4 mb-8">
+              <div className="w-24 h-4 bg-gray-700 rounded"></div>
+              <div className="w-20 h-4 bg-gray-700 rounded"></div>
+            </div>
+
+            {/* Author skeleton */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="h-10 w-10 rounded-full bg-gray-700"></div>
+              <div className="space-y-2">
+                <div className="h-4 w-20 bg-gray-700 rounded"></div>
+                <div className="h-3 w-40 bg-gray-700 rounded"></div>
+              </div>
+            </div>
+
+            {/* Image skeleton */}
+            <div className="h-[300px] md:h-[400px] lg:h-[500px] w-full bg-gray-700 rounded-lg mb-8"></div>
+
+            {/* Content skeleton */}
+            <div className="space-y-4 mb-12">
+              <div className="h-4 bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 rounded w-5/6"></div>
+              <div className="h-4 bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 rounded w-4/5"></div>
+              <div className="h-4 bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-700 rounded w-5/6"></div>
+              <div className="h-4 bg-gray-700 rounded w-full"></div>
+            </div>
+
+            {/* Tags skeleton */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              <div className="h-6 w-16 bg-gray-700 rounded-full"></div>
+              <div className="h-6 w-20 bg-gray-700 rounded-full"></div>
+              <div className="h-6 w-24 bg-gray-700 rounded-full"></div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Featured image */}
-      <div className="aspect-video max-w-4xl mx-auto bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-
-      {/* Post content */}
-      <div className="max-w-4xl mx-auto space-y-4">
-        <div className="h-6 w-full bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-        <div className="h-6 w-5/6 bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-        <div className="h-6 w-full bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-        <div className="h-6 w-4/6 bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-
-        <div className="py-2"></div>
-
-        <div className="h-6 w-full bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-        <div className="h-6 w-full bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-        <div className="h-6 w-3/6 bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse" />
-      </div>
-
-      {/* Tags */}
-      <div className="flex gap-2 max-w-4xl mx-auto">
-        <div className="h-8 w-20 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
-        <div className="h-8 w-24 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
-        <div className="h-8 w-16 bg-gray-200 dark:bg-gray-800 rounded-full animate-pulse" />
-      </div>
-
-      {/* Related posts */}
-      <div className="mt-12">
-        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse mx-auto mb-6" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Array(3)
-            .fill(0)
-            .map((_, i) => (
-              <div key={i} className="bg-gray-200 dark:bg-gray-800 rounded-md animate-pulse aspect-video" />
-            ))}
-        </div>
-      </div>
-    </div>
-  )
+      </article>
+    </main>
+  );
 }

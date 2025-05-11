@@ -7,7 +7,7 @@ export function isServerRoute(pathname: string): boolean {
     // API routes
     /^\/api\/projects\/featured/,
     /^\/api\/projects\/clear-cache/,
-    /^\/api\/projects\/\[slug\]/,
+    /^\/api\/projects\/[^/]+/, // Proper pattern for dynamic segments
     /^\/api\/research-projects\/featured/,
     /^\/api\/research-projects\/revalidate/,
     /^\/api\/blog\/featured/,
@@ -16,6 +16,13 @@ export function isServerRoute(pathname: string): boolean {
     /^\/api\/all\/revalidate/,
     /^\/api\/analytics\/.*/,
     /^\/api\/cron\/.*/,
+
+    // AI and chat routes
+    /^\/api\/chat\/.*/,
+    /^\/api\/chat$/,
+    /^\/api\/admin\/assistant\/.*/,
+    /^\/api\/admin\/assistant$/,
+    /^\/api\/rag\/.*/,
 
     // Admin routes
     /^\/admin\/.*/,

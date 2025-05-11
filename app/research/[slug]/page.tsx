@@ -1,7 +1,10 @@
-import type { Metadata } from "next"
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import { getResearchProjectBySlug } from "@/lib/research-project-service"
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import {
+  getResearchProjectBySlug,
+  getAllResearchProjects,
+} from "@/lib/research-project-service";
 import {
   Calendar,
   Clock,
@@ -21,8 +24,8 @@ import {
   Atom,
   Zap,
   Layers,
-} from "lucide-react"
-import { ScrollToTop } from "@/components/scroll-to-top"
+} from "lucide-react";
+import { ScrollToTop } from "@/components/scroll-to-top";
 
 // Project categories with corresponding icons
 const CATEGORIES: Record<string, any> = {
@@ -36,17 +39,31 @@ const CATEGORIES: Record<string, any> = {
   Research: Microscope,
   Engineering: Layers,
   Energy: Zap,
+};
+
+// Set a revalidation period for all research project pages (3 hours)
+export const revalidate = 10800;
+
+export async function generateStaticParams() {
+  const projects = await getAllResearchProjects();
+  return projects.map((project) => ({
+    slug: project.slug,
+  }));
 }
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const project = await getResearchProjectBySlug(params.slug)
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const project = await getResearchProjectBySlug(params.slug);
 
   if (!project) {
     return {
       title: "Research Project Not Found",
       description: "The requested research project could not be found.",
-    }
+    };
   }
 
   return {
@@ -57,21 +74,25 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       description: project.description,
       images: project.image_url ? [{ url: project.image_url }] : undefined,
     },
-  }
+  };
 }
 
-export default async function ResearchProjectPage({ params }: { params: { slug: string } }) {
-  const project = await getResearchProjectBySlug(params.slug)
+export default async function ResearchProjectPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const project = await getResearchProjectBySlug(params.slug);
 
   if (!project) {
-    notFound()
+    notFound();
   }
 
   // Get category icon
   const getCategoryIcon = (category: string) => {
-    const IconComponent = CATEGORIES[category] || Layers
-    return <IconComponent className="h-5 w-5" />
-  }
+    const IconComponent = CATEGORIES[category] || Layers;
+    return <IconComponent className="h-5 w-5" />;
+  };
 
   // Format dates
   const formatDate = (dateString: string) => {
@@ -79,19 +100,21 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   // Get priority class
   const getPriorityClass = (priority: string) => {
     return (
       {
         high: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
-        medium: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+        medium:
+          "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
         low: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-      }[priority] || "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-    )
-  }
+      }[priority] ||
+      "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -115,18 +138,24 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
               <span className="ml-1">{project.category}</span>
             </div>
             <div
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getPriorityClass(project.priority)}`}
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getPriorityClass(
+                project.priority
+              )}`}
             >
               {project.priority === "high"
                 ? "High Priority"
                 : project.priority === "medium"
-                  ? "Medium Priority"
-                  : "Low Priority"}
+                ? "Medium Priority"
+                : "Low Priority"}
             </div>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{project.title}</h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 mb-4">{project.description}</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            {project.title}
+          </h1>
+          <p className="text-xl text-gray-700 dark:text-gray-300 mb-4">
+            {project.description}
+          </p>
         </div>
 
         {/* Project image */}
@@ -184,11 +213,18 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
               {/* Completion */}
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Completion</span>
-                  <span className="text-sm font-medium">{project.completion}%</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    Completion
+                  </span>
+                  <span className="text-sm font-medium">
+                    {project.completion}%
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                  <div className="bg-primary h-2.5 rounded-full" style={{ width: `${project.completion}%` }}></div>
+                  <div
+                    className="bg-primary h-2.5 rounded-full"
+                    style={{ width: `${project.completion}%` }}
+                  ></div>
                 </div>
               </div>
 
@@ -196,26 +232,34 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
               <div className="space-y-3">
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                  <span className="text-sm">Started: {formatDate(project.startDate)}</span>
+                  <span className="text-sm">
+                    Started: {formatDate(project.startDate)}
+                  </span>
                 </div>
 
                 {project.endDate && (
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                    <span className="text-sm">Deadline: {formatDate(project.endDate)}</span>
+                    <span className="text-sm">
+                      Deadline: {formatDate(project.endDate)}
+                    </span>
                   </div>
                 )}
 
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 text-gray-500 mr-2" />
-                  <span className="text-sm">Days remaining: {project.daysRemaining}</span>
+                  <span className="text-sm">
+                    Days remaining: {project.daysRemaining}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Tags */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-3">Technologies & Skills</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                Technologies & Skills
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {project.tags.map((tag, index) => (
                   <div
@@ -261,8 +305,12 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
               {project.recentUpdates.map((update, index) => (
                 <div key={index} className="mb-8 relative">
                   <div className="absolute -left-8 mt-1.5 w-4 h-4 rounded-full bg-primary"></div>
-                  <div className="mb-1 text-sm text-gray-500 dark:text-gray-400">{update.date}</div>
-                  <p className="text-gray-800 dark:text-gray-200">{update.text}</p>
+                  <div className="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                    {update.date}
+                  </div>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {update.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -275,14 +323,16 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
             <h2 className="text-2xl font-bold mb-6">Research Team</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {project.teamMembers.map((member, index) => {
-                const isLead = member.includes("(Lead)")
-                const name = isLead ? member.replace(" (Lead)", "") : member
+                const isLead = member.includes("(Lead)");
+                const name = isLead ? member.replace(" (Lead)", "") : member;
 
                 return (
                   <div
                     key={index}
                     className={`p-4 rounded-lg border ${
-                      isLead ? "border-primary/30 bg-primary/5" : "border-gray-200 dark:border-gray-700"
+                      isLead
+                        ? "border-primary/30 bg-primary/5"
+                        : "border-gray-200 dark:border-gray-700"
                     }`}
                   >
                     <div className="flex items-center">
@@ -291,11 +341,15 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
                       </div>
                       <div>
                         <div className="font-medium">{name}</div>
-                        {isLead && <div className="text-xs text-primary">Project Lead</div>}
+                        {isLead && (
+                          <div className="text-xs text-primary">
+                            Project Lead
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -306,16 +360,20 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
           <h2 className="text-2xl font-bold mb-6">Related Research Projects</h2>
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6 text-center">
             <BarChart3 className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-            <p className="text-gray-600 dark:text-gray-400">Related projects will be displayed here in the future.</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Related projects will be displayed here in the future.
+            </p>
           </div>
         </div>
 
         {/* Call to action */}
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Interested in this research?</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Interested in this research?
+          </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
-            If you're interested in collaborating or learning more about this research project, feel free to reach out
-            for more information.
+            If you're interested in collaborating or learning more about this
+            research project, feel free to reach out for more information.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -336,5 +394,5 @@ export default async function ResearchProjectPage({ params }: { params: { slug: 
         </div>
       </div>
     </div>
-  )
+  );
 }

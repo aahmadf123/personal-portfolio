@@ -1,27 +1,41 @@
-import { Suspense } from "react"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Hero } from "@/components/hero"
-import { About } from "@/components/about"
-import { Organizations } from "@/components/organizations"
-import { SkillsDatabase } from "@/components/skills-database"
-import { CurrentProjects } from "@/components/current-projects"
-import dynamic from "next/dynamic"
+import { Suspense } from "react";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Hero } from "@/components/hero";
+import { About } from "@/components/about";
+import { Organizations } from "@/components/organizations";
+import { SkillsDatabase } from "@/components/skills-database";
+import { CurrentProjects } from "@/components/current-projects";
+import dynamic from "next/dynamic";
 
 // Dynamic imports for components that can be loaded after initial page render
-const Projects = dynamic(() => import("@/components/projects").then((mod) => mod.Projects), {
-  ssr: true,
-  loading: () => <div className="min-h-[400px] flex items-center justify-center">Loading projects...</div>,
-})
+const Projects = dynamic(
+  () => import("@/components/projects").then((mod) => mod.Projects),
+  {
+    ssr: true,
+    loading: () => (
+      <div className="min-h-[400px] flex items-center justify-center">
+        Loading projects...
+      </div>
+    ),
+  }
+);
 
-const Contact = dynamic(() => import("@/components/contact").then((mod) => mod.Contact), {
-  ssr: true,
-})
+const Contact = dynamic(
+  () => import("@/components/contact").then((mod) => mod.Contact),
+  {
+    ssr: true,
+  }
+);
+
+// Set homepage revalidation (6 hours)
+export const revalidate = 21600;
 
 export const metadata = {
   title: "Ahmad Firas - Portfolio",
-  description: "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
-}
+  description:
+    "Personal portfolio showcasing projects in computer science, engineering, and mathematics",
+};
 
 export default function HomePage() {
   return (
@@ -37,7 +51,11 @@ export default function HomePage() {
 
           {/* Use Suspense for components that fetch data */}
           <Suspense
-            fallback={<div className="min-h-[400px] flex items-center justify-center">Loading projects...</div>}
+            fallback={
+              <div className="min-h-[400px] flex items-center justify-center">
+                Loading projects...
+              </div>
+            }
           >
             <Projects />
           </Suspense>
@@ -47,5 +65,5 @@ export default function HomePage() {
         <Footer />
       </div>
     </>
-  )
+  );
 }

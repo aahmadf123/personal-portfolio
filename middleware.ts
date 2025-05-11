@@ -18,13 +18,12 @@ export function middleware(request: NextRequest) {
 }
 
 // Define paths that should be processed by the middleware
-// Include all the dynamic routes that were flagged in the error
 export const config = {
   matcher: [
     // API routes that need special handling
     "/api/:path*",
     "/admin/:path*",
-    // Skip static assets
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    // Skip static assets and other internal Next.js paths
+    "/((?!_next/static|_next/image|favicon.ico|images|logos).*)",
   ],
 };

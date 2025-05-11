@@ -8,7 +8,11 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    domains: ["localhost", "your-project-id.supabase.co"],
+    // Use environment variable for Supabase domain or fall back to default
+    domains: [
+      "localhost",
+      process.env.SUPABASE_PROJECT_URL || "your-project-id.supabase.co",
+    ],
     remotePatterns: [
       {
         protocol: "https",
@@ -18,6 +22,7 @@ const nextConfig = {
       },
     ],
   },
+  // Use standalone for server components, consider 'export' for fully static sites
   output: "standalone",
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
@@ -26,10 +31,8 @@ const nextConfig = {
   env: {
     NETLIFY: process.env.NETLIFY,
   },
-  // Force fully dynamic rendering for problematic routes
-  exportPathMap: async function (defaultPathMap) {
-    return defaultPathMap;
-  },
+  // Note: For static paths in App Router, use generateStaticParams in your page components
+  // instead of exportPathMap which is only for Pages Router
 };
 
 export default nextConfig;

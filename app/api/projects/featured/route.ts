@@ -3,12 +3,15 @@ import { createServerSupabaseClient } from "@/lib/supabase";
 
 export const revalidate = 3600;
 
+// Generate static params for just the default case
+export const generateStaticParams = async () => {
+  return [{}]; // Default params with no limit
+};
+
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const limit = searchParams.get("limit")
-      ? Number.parseInt(searchParams.get("limit") as string)
-      : 3;
+    // Use a fixed limit for static generation
+    const limit = 3; // Fixed limit for featured projects on static pages
 
     const supabase = createServerSupabaseClient();
 

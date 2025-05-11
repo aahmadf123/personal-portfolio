@@ -15,14 +15,13 @@ export const revalidate = 86400;
 
 async function getTimelineEntries() {
   try {
-    // Fetch timeline data from API
+    // Fetch timeline data from API using ISR (Incremental Static Regeneration)
     const res = await fetch(
       `${
         process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
       }/api/timeline`,
       {
-        next: { revalidate: 86400 },
-        cache: "no-store", // Force fresh data
+        next: { revalidate: 86400 }, // Use ISR with 24 hour revalidation
       }
     );
 

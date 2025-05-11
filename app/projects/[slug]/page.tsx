@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -12,6 +15,15 @@ import {
   Clock,
 } from "lucide-react";
 import { getProjectBySlug, getAllProjects } from "@/lib/project-service";
+import { Badge } from "@/components/ui/badge";
+import { ShareButtons } from "@/components/share-buttons";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { ProjectSidebar } from "./project-sidebar";
+import { ProjectChallenge } from "./project-challenge";
+import { ProjectTimeline } from "./project-timeline";
+import { CopyLinkButton } from "@/components/copy-link-button";
+import { Separator } from "@/components/ui/separator";
+import { RelatedProjects } from "./related-projects";
 
 type Props = {
   params: { slug: string };
@@ -43,6 +55,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       project.summary ||
       `Details about ${project.title}`,
   };
+}
+
+interface FallbackImageProps {
+  src: string;
+  alt: string;
+  fill?: boolean;
+  className?: string;
+  priority?: boolean;
+}
+
+// Create a client component to handle image loading fallback
+function FallbackImage({ src, alt, fill, className, priority }: FallbackImageProps) {
+  const [imgSrc, setImgSrc] = useState(src);
+
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt}
+      fill={fill}
+      className={className}
+      priority={priority}
+      onError={() => setImgSrc("/broken-image-icon.png")}
+    />
+  );
 }
 
 export default async function ProjectPage({ params }: Props) {
@@ -181,16 +217,12 @@ export default async function ProjectPage({ params }: Props) {
 
       {/* Main image */}
       <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-lg overflow-hidden mb-8">
-        <Image
+        <FallbackImage
           src={mainImage || "/placeholder.svg"}
           alt={project.title}
           fill
           className="object-cover"
           priority
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = "/broken-image-icon.png";
-          }}
         />
       </div>
 
@@ -266,15 +298,11 @@ export default async function ProjectPage({ params }: Props) {
                       key={image.id}
                       className="relative h-48 rounded-lg overflow-hidden"
                     >
-                      <Image
+                      <FallbackImage
                         src={image.url || "/placeholder.svg"}
                         alt={image.alt_text || `${project.title} image`}
                         fill
                         className="object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = "/broken-image-icon.png";
-                        }}
                       />
                       {image.caption && (
                         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white p-2 text-sm">

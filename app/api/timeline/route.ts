@@ -9,13 +9,17 @@ import {
 // Set revalidation period to 24 hours (86400 seconds)
 export const revalidate = 86400;
 
+// Static data options - use a limited set for the static build
+export const generateStaticParams = async () => {
+  return [{}]; // Default params (no limit or type filter)
+};
+
 export async function GET(request: NextRequest) {
   try {
-    // Parse the limit parameter from the URL query string
-    const url = new URL(request.url);
-    const limitParam = url.searchParams.get("limit");
-    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
-    const typeFilter = url.searchParams.get("type");
+    // For static generation, don't use URL parameters
+    // We'll return all entries and let the client do filtering
+    const limit = undefined; // No limit for static generation
+    const typeFilter = undefined; // No type filter for static generation
 
     // Get all timeline entries from various tables in parallel
     const [experience, education, certifications, achievements] =
@@ -154,13 +158,8 @@ export async function GET(request: NextRequest) {
         .filter(Boolean),
     ].filter(Boolean); // Final filter to remove any null entries
 
-    // Filter by type if specified
-    const filteredEntries = typeFilter
-      ? allEntries.filter((entry) => entry.type === typeFilter)
-      : allEntries;
-
-    // Sort entries by date in descending order with error handling
-    const sortedEntries = filteredEntries.sort((a, b) => {
+    // Use static filter/sort/limit logic without URL params
+    const sortedEntries = allEntries.sort((a, b) => {
       try {
         const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
         const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
@@ -171,12 +170,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Limit results if requested
-    const limitedEntries = limit
-      ? sortedEntries.slice(0, limit)
-      : sortedEntries;
-
-    return NextResponse.json(limitedEntries);
+    return NextResponse.json(sortedEntries);
   } catch (error) {
     console.error("Error in timeline API:", error);
     return NextResponse.json(

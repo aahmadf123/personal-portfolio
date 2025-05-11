@@ -174,89 +174,103 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 
 export async function getFeaturedProjects(): Promise<Project[]> {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*, project_technologies(*), project_tags(*), project_images(*)")
-    .eq("is_featured", true)
-    .order("order_index", { ascending: true });
 
-  if (error) {
-    console.error("Error fetching featured projects:", error);
-    throw error;
-  }
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*, project_technologies(*), project_tags(*), project_images(*)")
+      .eq("is_featured", true)
+      .order("order_index", { ascending: true });
 
-  if (!data || !Array.isArray(data)) {
-    return [];
-  }
+    if (error) {
+      console.error("Error fetching featured projects:", error);
+      return [];
+    }
 
-  // Process projects with consistent image handling
-  return data.map((project) => {
-    try {
-      // Find main image from project_images if it exists
-      const mainImage = project.project_images?.find((img: any) => img.is_main);
-      const thumbnailUrl = project.thumbnail_url || null;
-      const mainImageUrl = mainImage?.url || project.main_image_url || null;
+    if (!data || !Array.isArray(data)) {
+      return [];
+    }
 
-      // Process image URLs consistently
-      const processedThumbnail = thumbnailUrl
-        ? transformStorageUrl(thumbnailUrl)
-        : null;
-      const processedMainImage = mainImageUrl
-        ? transformStorageUrl(mainImageUrl)
-        : null;
+    // Process projects with consistent image handling
+    return data.map((project) => {
+      try {
+        // Find main image from project_images if it exists
+        const mainImage = project.project_images?.find(
+          (img: any) => img.is_main
+        );
+        const thumbnailUrl = project.thumbnail_url || null;
+        const mainImageUrl = mainImage?.url || project.main_image_url || null;
 
-      // Calculate image_url from available sources without using fallbacks
-      const imageUrl = processedThumbnail || processedMainImage;
+        // Process image URLs consistently
+        const processedThumbnail = thumbnailUrl
+          ? transformStorageUrl(thumbnailUrl)
+          : null;
+        const processedMainImage = mainImageUrl
+          ? transformStorageUrl(mainImageUrl)
+          : null;
 
-      return {
-        ...project,
-        id: project.id.toString(),
-        thumbnail_url: processedThumbnail,
-        main_image_url: processedMainImage,
-        image_url: imageUrl,
-        technologies: project.project_technologies
-          ? project.project_technologies.map((tech: any) => tech.name)
-          : [],
-        tags: project.project_tags
-          ? project.project_tags.map((tag: any) => tag.name)
-          : [],
-        images: project.project_images
-          ? project.project_images.map((img: any) => ({
-              url: img.url ? transformStorageUrl(img.url) : null,
-              alt: img.alt_text || project.title,
-              caption: img.caption || "",
-            }))
-          : [],
-        featured: project.is_featured,
-        completion:
+        // Calculate image_url from available sources without using fallbacks
+        const imageUrl = processedThumbnail || processedMainImage;
+
+        // Calculate completion based on status instead of using the database column
+        const completion =
           project.status === "completed"
             ? 100
             : project.status === "in-progress"
             ? 50
             : project.status === "planned"
             ? 0
-            : 75,
-      };
-    } catch (err) {
-      console.error(
-        `Error processing featured project data for ID ${project.id}:`,
-        err
-      );
-      // Return basic project data if processing failed
-      return {
-        ...project,
-        id: project.id.toString(),
-        thumbnail_url: null,
-        main_image_url: null,
-        image_url: null,
-        technologies: [],
-        tags: [],
-        images: [],
-        featured: project.is_featured,
-        completion: 0,
-      };
-    }
-  });
+            : 75;
+
+        return {
+          ...project,
+          id: project.id.toString(),
+          thumbnail_url: processedThumbnail,
+          main_image_url: processedMainImage,
+          image_url: imageUrl,
+          technologies: project.project_technologies
+            ? project.project_technologies.map((tech: any) => tech.name)
+            : [],
+          tags: project.project_tags
+            ? project.project_tags.map((tag: any) => tag.name)
+            : [],
+          images: project.project_images
+            ? project.project_images.map((img: any) => ({
+                url: img.url ? transformStorageUrl(img.url) : null,
+                alt: img.alt_text || project.title,
+                caption: img.caption || "",
+              }))
+            : [],
+          featured: project.is_featured,
+          completion: completion,
+          // Add safe defaults for any fields that might be expected but don't exist
+          priority: "medium",
+        };
+      } catch (err) {
+        console.error(
+          `Error processing featured project data for ID ${project.id}:`,
+          err
+        );
+        // Return basic project data if processing failed
+        return {
+          ...project,
+          id: project.id.toString(),
+          thumbnail_url: null,
+          main_image_url: null,
+          image_url: null,
+          technologies: [],
+          tags: [],
+          images: [],
+          featured: project.is_featured,
+          completion: 0,
+          priority: "medium",
+        };
+      }
+    });
+  } catch (outerError) {
+    console.error("Unexpected error in getFeaturedProjects:", outerError);
+    return [];
+  }
 }
 
 // Organizations

@@ -73,8 +73,8 @@ export async function getAllProjects(): Promise<Project[]> {
         .select(
           `
           id, title, slug, description, summary, 
-          github_url, demo_url, video_url, status, completion,
-          start_date, end_date, category, is_featured, priority, order_index,
+          github_url, demo_url, video_url, status,
+          start_date, end_date, is_featured, order_index,
           thumbnail_url, main_image_url,
           project_tags (*),
           project_technologies (*),
@@ -110,7 +110,7 @@ export async function getFeaturedProjects(limit = 3): Promise<Project[]> {
           `
           id, title, slug, description, summary, 
           github_url, demo_url, video_url, status,
-          start_date, end_date, category, is_featured, order_index,
+          start_date, end_date, is_featured, order_index,
           thumbnail_url, main_image_url,
           project_tags (*),
           project_technologies (*),
@@ -154,8 +154,8 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
         .select(
           `
           id, title, slug, description, summary, 
-          github_url, demo_url, video_url, status, completion,
-          start_date, end_date, category, is_featured, priority, order_index,
+          github_url, demo_url, video_url, status,
+          start_date, end_date, is_featured, order_index,
           thumbnail_url, main_image_url,
           project_tags (*),
           project_technologies (*),

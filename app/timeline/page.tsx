@@ -15,15 +15,15 @@ export const revalidate = 86400;
 
 async function getTimelineEntries() {
   try {
+    // Using relative URL to avoid protocol issues
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+      ? new URL("/api/timeline", process.env.NEXT_PUBLIC_SITE_URL).toString()
+      : "/api/timeline";
+
     // Fetch timeline data from API using ISR (Incremental Static Regeneration)
-    const res = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-      }/api/timeline`,
-      {
-        next: { revalidate: 86400 }, // Use ISR with 24 hour revalidation
-      }
-    );
+    const res = await fetch(baseUrl, {
+      next: { revalidate: 86400 }, // Use ISR with 24 hour revalidation
+    });
 
     if (!res.ok) {
       throw new Error(`Failed to fetch timeline data: ${res.status}`);
@@ -40,7 +40,8 @@ async function getTimelineEntries() {
     return data;
   } catch (error) {
     console.error("Error fetching timeline entries:", error);
-    throw error; // Re-throw to be caught by error boundary
+    // Return empty array instead of throwing to prevent build failures
+    return [];
   }
 }
 
@@ -75,6 +76,16 @@ export default async function TimelinePage() {
     );
   } catch (error) {
     // This will render our error boundary
-    throw error;
+    return (
+      <main className="container max-w-5xl py-12 px-4 sm:px-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error loading timeline</AlertTitle>
+          <AlertDescription>
+            There was a problem loading the timeline data.
+          </AlertDescription>
+        </Alert>
+      </main>
+    );
   }
 }

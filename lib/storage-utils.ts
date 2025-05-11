@@ -40,7 +40,7 @@ export function getPlaceholderImageUrl(): null {
  * @returns URL to the resource or null if invalid
  */
 export function transformStorageUrl(url: string): string | null {
-  console.log(`Transforming URL: ${url}`);
+  console.log(`START transformStorageUrl for: "${url}"`);
 
   if (!url) {
     console.warn("Empty URL provided to transformStorageUrl");
@@ -48,6 +48,15 @@ export function transformStorageUrl(url: string): string | null {
   }
 
   try {
+    // For debugging - log URL type
+    if (url.startsWith("http")) {
+      console.log(`URL appears to be absolute: ${url}`);
+    } else if (url.startsWith("/")) {
+      console.log(`URL appears to be server-relative: ${url}`);
+    } else {
+      console.log(`URL appears to be storage path: ${url}`);
+    }
+
     // Handle complete Supabase storage URLs - preserve as is
     if (
       url.includes("supabase.co/storage/") ||
@@ -63,11 +72,22 @@ export function transformStorageUrl(url: string): string | null {
       return url;
     }
 
+    // Handle placeholder images for testing
+    if (
+      url.includes("via.placeholder.com") ||
+      url.includes("placekitten.com")
+    ) {
+      console.log(`URL is a placeholder image: ${url}`);
+      return url;
+    }
+
     // Handle storage paths that might be full references to bucket objects
     if (url.includes(`${BUCKET_NAME}/`)) {
       const pathInBucket = url.split(`${BUCKET_NAME}/`)[1];
       console.log(`Processing URL as bucket path: ${pathInBucket}`);
-      return getStorageUrl(pathInBucket);
+      const result = getStorageUrl(pathInBucket);
+      console.log(`Transformed bucket path, result: ${result}`);
+      return result;
     }
 
     // Check if this is a relative path
@@ -82,7 +102,9 @@ export function transformStorageUrl(url: string): string | null {
       if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url)) {
         // Try to get the storage URL
         console.log(`Converting relative image path: ${url}`);
-        return getStorageUrl(url.substring(1));
+        const result = getStorageUrl(url.substring(1));
+        console.log(`Transformed relative path, result: ${result}`);
+        return result;
       }
 
       // For any other paths, return as is
@@ -98,10 +120,13 @@ export function transformStorageUrl(url: string): string | null {
 
     // For any other case, assume it's a relative path that needs conversion
     console.log(`Treating as storage path: ${url}`);
-    return getStorageUrl(url);
+    const result = getStorageUrl(url);
+    console.log(`Transformed storage path, result: ${result}`);
+    return result;
   } catch (error) {
     console.error(`Error transforming URL ${url}:`, error);
-    return null; // Return null if transformation fails
+    // Fallback to original URL in case of transformation error
+    return url;
   }
 }
 

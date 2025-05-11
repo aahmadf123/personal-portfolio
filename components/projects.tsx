@@ -60,6 +60,52 @@ function FallbackImage({
   );
 }
 
+// Function to fetch featured projects
+const fetchFeaturedProjects = async () => {
+  console.log("Fetching featured projects from API...");
+  try {
+    // Add cache-busting query parameter and timestamp
+    const response = await fetch(
+      `/api/projects/featured?limit=3&t=${Date.now()}`,
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      console.error(
+        `Error response from featured projects API: ${response.status} ${response.statusText}`
+      );
+      const text = await response.text();
+      console.error(`Response body: ${text}`);
+      throw new Error(`Failed to fetch featured projects: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(
+      `Received ${
+        Array.isArray(data) ? data.length : 0
+      } featured projects from API`
+    );
+
+    if (Array.isArray(data) && data.length > 0) {
+      console.log("Featured projects:", data.map((p) => p.title).join(", "));
+      data.forEach((project) => {
+        console.log(`Project "${project.title}" images:`, {
+          thumbnail_url: project.thumbnail_url || "null",
+          main_image_url: project.main_image_url || "null",
+          image_url: project.image_url || "null",
+        });
+      });
+    } else {
+      console.warn("No featured projects returned from API");
+    }
+
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error fetching featured projects:", error);
+    return [];
+  }
+};
+
 export function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);

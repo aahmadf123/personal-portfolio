@@ -99,9 +99,11 @@ export async function getAllProjects(): Promise<Project[]> {
 
 export async function getFeaturedProjects(limit = 3): Promise<Project[]> {
   try {
+    console.log("getFeaturedProjects called with limit:", limit);
     return await retryOperation(async () => {
       const supabase = createServerSupabaseClient();
 
+      console.log("Querying database for featured projects...");
       // Use the Supabase client directly for better reliability
       // Only select columns that exist in the database
       const { data, error } = await supabase
@@ -122,13 +124,60 @@ export async function getFeaturedProjects(limit = 3): Promise<Project[]> {
         .limit(limit);
 
       if (error) {
+        console.error("Error fetching featured projects:", error);
         throw handleDatabaseError(error, "fetch", "featured projects", {
           limit,
         });
       }
 
+      console.log(`Found ${data?.length || 0} featured projects.`);
+
+      if (!data || data.length === 0) {
+        console.log(
+          "No featured projects found. Returning mock data for development."
+        );
+        if (process.env.NODE_ENV === "development") {
+          // Return mock data in development to help with debugging
+          return [
+            {
+              id: 999,
+              title: "Mock Featured Project",
+              slug: "mock-featured-project",
+              description: "This is a mock project for development purposes",
+              summary: "Mock project summary",
+              thumbnail_url:
+                "https://via.placeholder.com/300x200?text=Mock+Project",
+              main_image_url:
+                "https://via.placeholder.com/800x400?text=Mock+Project+Main",
+              image_url:
+                "https://via.placeholder.com/300x200?text=Mock+Project",
+              github_url: "https://github.com",
+              demo_url: "https://example.com",
+              is_featured: true,
+              status: "completed",
+              completion: 100,
+              start_date: new Date().toISOString(),
+              end_date: new Date().toISOString(),
+              tags: ["mock", "featured"],
+              technologies: ["react", "nextjs"],
+              priority: "high",
+              order_index: 1,
+            },
+          ];
+        }
+      }
+
       // Process the data to ensure consistent structure
-      return (data || []).map(processProjectData);
+      const processedProjects = (data || []).map((projectData) => {
+        const processed = processProjectData(projectData);
+        console.log(`Processed project "${processed.title}":`);
+        console.log(`- thumbnail_url: ${processed.thumbnail_url || "null"}`);
+        console.log(`- main_image_url: ${processed.main_image_url || "null"}`);
+        console.log(`- image_url: ${processed.image_url || "null"}`);
+        return processed;
+      });
+
+      return processedProjects;
     });
   } catch (error) {
     console.error("Error in getFeaturedProjects:", error);

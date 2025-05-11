@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Personal Portfolio
 
 A modern portfolio website built with Next.js, featuring project showcases, blog posts, and skill demonstrations. The site was originally hosted on Vercel and has been migrated to Netlify with Supabase for database and storage.
@@ -82,6 +81,26 @@ pnpm build
 ## Contact
 
 Feel free to reach out if you have any questions or suggestions!
-=======
-# Personal Website
->>>>>>> fd62990f10ba9702a95356dc947b9cd36b1f39cd
+
+## GitHub Integration
+
+This project includes integration with GitHub repositories to automatically update research projects based on GitHub activity:
+
+1. **Automatic Updates**: When commits, issues, or pull requests are created or closed in a linked GitHub repository, the corresponding research project in the portfolio is automatically updated.
+
+2. **Setup Instructions**:
+
+   - Add the GitHub repository URL as a resource to your research project
+   - In your GitHub repository, add the following secrets:
+     - `WEBHOOK_URL`: Your portfolio webhook URL (e.g., `https://yourportfolio.com/api/github/webhook`)
+     - `WEBHOOK_SECRET`: A random secret string you generate to verify webhooks
+     - `API_TOKEN`: Your Supabase service role key
+
+3. **Features**:
+
+   - Commits are added as project updates
+   - Issues labeled as challenges are added to the project challenges
+   - Completed milestones update the project completion percentage
+   - Merged PRs increase project completion
+
+4. **Manual Sync**: Visit `/api/github/sync-projects` to manually trigger a sync of all research projects with their GitHub repositories.

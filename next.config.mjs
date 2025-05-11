@@ -56,6 +56,8 @@ const nextConfig = {
     // Properly handle static chunks in App Router
     optimizeCss: true,
     optimizePackageImports: ["lucide-react"],
+    forceStatic: true,
+    serverComponents: true,
   },
 
   // Special config for Netlify
@@ -73,6 +75,19 @@ const nextConfig = {
       "/api/projects/featured",
       "/api/admin/db-pool-stats",
     ],
+  },
+
+  // Configure for Netlify Edge Functions
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // This ensures middleware is bundled correctly for Edge runtime
+      const originalEntry = config.entry;
+      config.entry = async () => {
+        const entries = await originalEntry();
+        return entries;
+      };
+    }
+    return config;
   },
 };
 

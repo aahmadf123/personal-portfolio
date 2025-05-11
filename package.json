@@ -2,6 +2,7 @@
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +10,10 @@
     "lint": "next lint",
     "migrate-images": "ts-node scripts/migrate-images.ts",
     "setup-db": "ts-node scripts/setup-supabase-database.ts",
-    "migrate-data": "ts-node scripts/migrate-data-to-supabase.ts"
+    "migrate-data": "ts-node scripts/migrate-data-to-supabase.ts",
+    "set-featured": "node scripts/set-featured-projects.js",
+    "fix-assets": "node fix-static-assets.js",
+    "clear-cache": "node scripts/clear-cache.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "latest",
@@ -87,7 +91,8 @@
     "three": "latest",
     "uuid": "latest",
     "vaul": "^0.9.6",
-    "zod": "latest"
+    "zod": "latest",
+    "@netlify/plugin-nextjs": "^4.41.3"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.11.1",

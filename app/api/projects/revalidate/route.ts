@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 /**
  * API route to manually trigger revalidation of projects data
@@ -32,6 +32,46 @@ export async function POST(request: NextRequest) {
       {
         revalidated: false,
         error: "Failed to revalidate project data",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * API route to manually revalidate projects data
+ * Useful after updating projects in the database
+ */
+export async function GET() {
+  try {
+    console.log("Manual revalidation of projects requested");
+
+    // Revalidate project-related tags
+    revalidateTag("projects");
+    revalidateTag("featured-projects");
+
+    // Revalidate specific paths
+    revalidatePath("/");
+    revalidatePath("/projects");
+    revalidatePath("/api/projects/featured");
+
+    console.log("Revalidation complete");
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Projects revalidated",
+        timestamp: new Date().toISOString(),
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Revalidation error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to revalidate projects",
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

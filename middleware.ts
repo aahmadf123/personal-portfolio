@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isServerRoute } from "./app/server-routes.config";
 
+// Explicitly mark this file as using the Edge Runtime
+export const runtime = 'experimental-edge';
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -15,6 +18,7 @@ export function middleware(request: NextRequest) {
     // by adding a special header that Netlify's Next.js plugin will recognize
     const response = NextResponse.next();
     response.headers.set("x-middleware-next", "server");
+    response.headers.set("x-middleware-cache", "no-cache");
     return response;
   }
 
@@ -34,5 +38,7 @@ export const config = {
   matcher: [
     // Match all request paths except for the ones starting with:
     "/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)",
+    // Include API routes to ensure they're properly handled
+    "/api/:path*"
   ],
 };

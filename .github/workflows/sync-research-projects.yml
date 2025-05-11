@@ -1,0 +1,57 @@
+name: Sync Research Projects
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    types: [closed]
+    branches: [main, master]
+  issues:
+    types: [opened, closed, reopened]
+  milestone:
+    types: [created, closed, opened]
+  schedule:
+    # Run daily at midnight UTC to ensure everything is in sync
+    - cron: "0 0 * * *"
+
+jobs:
+  sync-with-portfolio:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send webhook to portfolio site
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+          REPO_NAME: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
+        run: |
+          # Create payload with repository information and event details
+          PAYLOAD=$(cat <<EOF
+          {
+            "repository": {
+              "full_name": "$REPO_NAME"
+            },
+            "event": {
+              "name": "$EVENT_NAME",
+              "action": "$EVENT_ACTION"
+            },
+            "sender": {
+              "login": "${{ github.actor }}"
+            }
+          }
+          EOF
+          )
+
+          # Generate SHA-256 signature for verification
+          SIGNATURE="sha256=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" | cut -d ' ' -f 2)"
+
+          # Send webhook to portfolio site
+          curl -X POST $WEBHOOK_URL \
+            -H "Content-Type: application/json" \
+            -H "X-Hub-Signature-256: $SIGNATURE" \
+            -H "X-GitHub-Event: repository_dispatch" \
+            -d "$PAYLOAD"
+
+          echo "Webhook sent to portfolio site"

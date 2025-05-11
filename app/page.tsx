@@ -21,6 +21,22 @@ const Projects = dynamic(
   }
 );
 
+// Use the enhanced version of featured projects for better image handling
+const EnhancedFeaturedProjects = dynamic(
+  () =>
+    import("@/components/enhanced-featured-projects").then(
+      (mod) => mod.EnhancedFeaturedProjects
+    ),
+  {
+    ssr: true,
+    loading: () => (
+      <div className="min-h-[400px] flex items-center justify-center">
+        Loading featured projects...
+      </div>
+    ),
+  }
+);
+
 const Contact = dynamic(
   () => import("@/components/contact").then((mod) => mod.Contact),
   {
@@ -28,8 +44,8 @@ const Contact = dynamic(
   }
 );
 
-// Set homepage revalidation (6 hours)
-export const revalidate = 21600;
+// Disable revalidation caching during development to see changes immediately
+export const revalidate = process.env.NODE_ENV === "development" ? 0 : 21600;
 
 export const metadata = {
   title: "Ahmad Firas - Portfolio",
@@ -49,11 +65,22 @@ export default function HomePage() {
           <SkillsDatabase />
           <CurrentProjects />
 
-          {/* Use Suspense for components that fetch data */}
+          {/* Use EnhancedFeaturedProjects for better image handling */}
           <Suspense
             fallback={
               <div className="min-h-[400px] flex items-center justify-center">
-                Loading projects...
+                Loading featured projects...
+              </div>
+            }
+          >
+            <EnhancedFeaturedProjects />
+          </Suspense>
+
+          {/* All other projects section */}
+          <Suspense
+            fallback={
+              <div className="min-h-[400px] flex items-center justify-center">
+                Loading more projects...
               </div>
             }
           >

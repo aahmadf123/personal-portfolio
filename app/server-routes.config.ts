@@ -4,6 +4,11 @@
 export function isServerRoute(pathname: string): boolean {
   // Define patterns for routes that should be server-rendered
   const serverRoutePatterns = [
+    // Dynamic content pages
+    /^\/projects\/[^/]+$/, // Project detail pages
+    /^\/blog\/[^/]+$/, // Blog post detail pages
+    /^\/research\/[^/]+$/, // Research project detail pages
+
     // API routes
     /^\/api\/projects\/featured/,
     /^\/api\/projects\/clear-cache/,

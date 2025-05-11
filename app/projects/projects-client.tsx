@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Project } from "@/types/projects";
+import { FallbackImage } from "@/components/fallback-image";
+import { transformStorageUrl } from "@/lib/storage-utils";
 
 interface ProjectsClientProps {
   projects: Project[];
@@ -144,6 +146,60 @@ export function ProjectsClient({ projects }: ProjectsClientProps) {
       });
     } catch (error) {
       console.error(`Error formatting date ${dateString}:`, error);
+      return null;
+    }
+  };
+
+  // Helper to properly process image URLs
+  const getProcessedImageUrl = (project: Project): string | null => {
+    try {
+      // First check for thumbnail_url which is preferred for list views
+      if (project.thumbnail_url) {
+        console.log(
+          `Using thumbnail_url for ${project.title}: ${project.thumbnail_url}`
+        );
+        return transformStorageUrl(project.thumbnail_url);
+      }
+
+      // Then try main_image_url
+      if (project.main_image_url) {
+        console.log(
+          `Using main_image_url for ${project.title}: ${project.main_image_url}`
+        );
+        return transformStorageUrl(project.main_image_url);
+      }
+
+      // Then try image_url
+      if (project.image_url) {
+        console.log(
+          `Using image_url for ${project.title}: ${project.image_url}`
+        );
+        return transformStorageUrl(project.image_url);
+      }
+
+      // Fallback to project_images
+      if (project.project_images && project.project_images.length > 0) {
+        const mainImage = project.project_images.find((img) => img.is_main);
+        if (mainImage && mainImage.url) {
+          console.log(
+            `Using project_images.url for ${project.title}: ${mainImage.url}`
+          );
+          return transformStorageUrl(mainImage.url);
+        }
+
+        // If no main image is found, use the first image
+        if (project.project_images[0].url) {
+          console.log(
+            `Using first project_images.url for ${project.title}: ${project.project_images[0].url}`
+          );
+          return transformStorageUrl(project.project_images[0].url);
+        }
+      }
+
+      // No image available
+      return null;
+    } catch (error) {
+      console.error(`Error processing image URL for ${project.title}:`, error);
       return null;
     }
   };
@@ -499,9 +555,8 @@ export function ProjectsClient({ projects }: ProjectsClientProps) {
         <AnimatePresence mode="wait">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project) => {
-              // Get the image URL with proper fallbacks
-              const imageUrl =
-                project.image_url || "/project-visualization.png";
+              // Get the image URL with more robust processing
+              const imageUrl = getProcessedImageUrl(project);
 
               // Format dates properly
               const startDate = formatDate(project.start_date);
@@ -546,18 +601,24 @@ export function ProjectsClient({ projects }: ProjectsClientProps) {
                       </span>
                     </div>
 
-                    {/* Project image */}
-                    <Image
-                      src={imageUrl || "/placeholder.svg"}
-                      alt={project.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => {
-                        console.error(`Image error for ${project.title}:`, e);
-                        const target = e.target as HTMLImageElement;
-                        target.src = "/broken-image-icon.png";
-                      }}
-                    />
+                    {/* Project image - Only display if we have a valid URL */}
+                    {imageUrl ? (
+                      <Image
+                        src={imageUrl}
+                        alt={project.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        onError={(e) => {
+                          console.error(`Image error for ${project.title}`);
+                        }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+                        <span className="text-gray-500">
+                          No image available
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col justify-between p-6 flex-1 relative">

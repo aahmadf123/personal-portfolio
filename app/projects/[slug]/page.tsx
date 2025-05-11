@@ -21,7 +21,7 @@ import { ProjectTimeline } from "./project-timeline";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { Separator } from "@/components/ui/separator";
 import { RelatedProjects } from "./related-projects";
-import { FallbackImage } from "@/components/fallback-image";
+import { transformStorageUrl } from "@/lib/storage-utils";
 
 type Props = {
   params: { slug: string };
@@ -32,6 +32,13 @@ export const revalidate = 10800;
 
 export async function generateStaticParams() {
   const projects = await getAllProjects();
+
+  // Log the slugs being generated for debugging
+  console.log(
+    "Generating static params for project slugs:",
+    projects.map((project) => project.slug)
+  );
+
   return projects.map((project) => ({
     slug: project.slug,
   }));
@@ -84,12 +91,42 @@ export default async function ProjectPage({ params }: Props) {
   const startDate = formatDate(project.start_date);
   const endDate = formatDate(project.end_date);
 
-  // Get main image
-  const mainImage =
-    project.main_image_url ||
-    project.thumbnail_url ||
-    project.image_url ||
-    "/project-visualization.png";
+  // Helper function to process image URLs properly
+  const getProcessedImageUrl = (url: string | null): string | null => {
+    if (!url) return null;
+
+    console.log(`Processing project image URL: ${url}`);
+    try {
+      return transformStorageUrl(url);
+    } catch (error) {
+      console.error(`Error transforming URL ${url}:`, error);
+      return null;
+    }
+  };
+
+  // Get main image with proper processing
+  const mainImageUrl =
+    project.main_image_url || project.thumbnail_url || project.image_url;
+  const mainImage = getProcessedImageUrl(mainImageUrl);
+
+  console.log(`Final main image URL for ${project.title}: ${mainImage}`);
+
+  // Find additional images from project_images
+  let additionalImages = [];
+  if (project.project_images && Array.isArray(project.project_images)) {
+    additionalImages = project.project_images
+      .map((img) => {
+        return {
+          ...img,
+          url: img.url ? getProcessedImageUrl(img.url) : null,
+        };
+      })
+      .filter((img) => img.url !== null); // Only keep images with valid URLs
+
+    console.log(
+      `Found ${additionalImages.length} valid additional images for ${project.title}`
+    );
+  }
 
   // Process tags and technologies
   const tags = project.project_tags
@@ -189,16 +226,18 @@ export default async function ProjectPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Main image */}
-      <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-lg overflow-hidden mb-8">
-        <FallbackImage
-          src={mainImage || "/placeholder.svg"}
-          alt={project.title}
-          fill
-          className="object-cover"
-          priority
-        />
-      </div>
+      {/* Main image - only show if we have one */}
+      {mainImage && (
+        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-lg overflow-hidden mb-8">
+          <Image
+            src={mainImage}
+            alt={project.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
 
       {/* Project content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -258,22 +297,22 @@ export default async function ProjectPage({ params }: Props) {
               </div>
             )}
 
-          {/* Additional images */}
-          {project.project_images && project.project_images.length > 1 && (
+          {/* Additional images - only show if we have valid ones */}
+          {additionalImages.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 Project Gallery
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {project.project_images
-                  .filter((img) => img.url !== mainImage)
+                {additionalImages
+                  .filter((img) => img.url !== mainImage && img.url !== null)
                   .map((image) => (
                     <div
                       key={image.id}
                       className="relative h-48 rounded-lg overflow-hidden"
                     >
-                      <FallbackImage
-                        src={image.url || "/placeholder.svg"}
+                      <Image
+                        src={image.url}
                         alt={image.alt_text || `${project.title} image`}
                         fill
                         className="object-cover"

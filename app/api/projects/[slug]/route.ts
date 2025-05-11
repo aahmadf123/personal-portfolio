@@ -1,44 +1,43 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getProjectBySlug } from "@/lib/project-service";
 
-export const revalidate = 3600; // Revalidate every hour
-
-interface Params {
-  slug: string;
-}
+export const dynamic = "force-dynamic";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Params }
+  request: Request,
+  { params }: { params: { slug: string } }
 ) {
-  const { slug } = params;
-
-  if (!slug) {
-    return NextResponse.json(
-      { error: "Project slug is required" },
-      { status: 400 }
-    );
-  }
-
   try {
-    console.log(`Fetching project with slug: ${slug}`);
+    // Get the slug from the URL
+    const slug = params.slug;
+
+    if (!slug) {
+      return NextResponse.json(
+        { error: "Slug parameter is required" },
+        { status: 400 }
+      );
+    }
+
+    // Attempt to retrieve the project with the given slug
     const project = await getProjectBySlug(slug);
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: `No project found with slug "${slug}"` },
+        { status: 404 }
+      );
     }
 
-    console.log(`Found project: ${project.title} with images:`, {
-      thumbnail_url: project.thumbnail_url,
-      main_image_url: project.main_image_url,
-      image_url: project.image_url,
+    // Return the project data
+    return NextResponse.json({
+      message: "Project found",
+      slug,
+      project,
     });
-
-    return NextResponse.json({ data: project });
   } catch (error) {
-    console.error(`Error fetching project with slug ${slug}:`, error);
+    console.error("Error in project slug API:", error);
     return NextResponse.json(
-      { error: "Failed to fetch project" },
+      { error: "Failed to fetch project details" },
       { status: 500 }
     );
   }

@@ -1,30 +1,39 @@
-import { NextResponse, type NextRequest } from "next/server"
-import { revalidatePath } from "next/cache"
-import { validateRevalidationRequest } from "@/lib/revalidation-utils"
+import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
-export const dynamic = "force-dynamic" // Make this route dynamic
+/**
+ * API route to manually trigger revalidation of projects data
+ * This ensures that both featured projects and regular projects stay in sync
+ * POST /api/projects/revalidate
+ */
+export const dynamic = "force-dynamic"; // Make this route dynamic
 
 export async function POST(request: NextRequest) {
   try {
-    // Validate the request using the new function
-    const validationResult = await validateRevalidationRequest(request)
+    // Get secret token from request headers to validate the request
+    const authHeader = request.headers.get("authorization");
 
-    if (!validationResult.success) {
-      return NextResponse.json({ error: validationResult.error }, { status: 401 })
-    }
+    // Optional: Validate token in a production environment
+    // if (!authHeader || authHeader !== `Bearer ${process.env.REVALIDATION_TOKEN}`) {
+    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // }
 
-    // Revalidate the projects API and pages
-    revalidatePath("/api/projects")
-    revalidatePath("/projects")
-    revalidatePath("/") // Revalidate homepage which may show featured projects
+    // Revalidate the 'projects' tag which is used by both project endpoints
+    revalidateTag("projects");
 
     return NextResponse.json({
       revalidated: true,
-      message: "Projects revalidated successfully",
+      message: "Project data revalidated successfully",
       timestamp: new Date().toISOString(),
-    })
+    });
   } catch (error) {
-    console.error("Error revalidating projects:", error)
-    return NextResponse.json({ error: "Failed to revalidate projects" }, { status: 500 })
+    console.error("Error revalidating project data:", error);
+    return NextResponse.json(
+      {
+        revalidated: false,
+        error: "Failed to revalidate project data",
+      },
+      { status: 500 }
+    );
   }
 }

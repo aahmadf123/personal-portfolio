@@ -12,6 +12,8 @@ const nextConfig = {
     domains: [
       "localhost",
       process.env.SUPABASE_PROJECT_URL || "your-project-id.supabase.co",
+      "h4rxhagyxlojdl32.public.blob.vercel-storage.com", // Add Vercel Blob storage
+      "supabase-violet-tree.supabase.co", // Add your Supabase storage directly
     ],
     remotePatterns: [
       {
@@ -20,24 +22,40 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.vercel-storage.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
-  // Use standalone for server components
+  // Use exportPathMap for better static generation with dynamic routes
+  // This ensures all JavaScript chunks are properly generated
+  exportPathMap: async function (defaultPathMap) {
+    // Preserve the default paths which includes the dynamic ones
+    return defaultPathMap;
+  },
+
+  // Improve server component handling
   output: "standalone",
-  
+
   // Improve Netlify integration
   trailingSlash: false, // Ensure consistent URL handling
-  
+
   // Improve static export handling
   poweredByHeader: false,
-  
+
   // Improve build process for Netlify
   swcMinify: true,
-  
+
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
+    // Properly handle static chunks in App Router
+    optimizeCss: true,
+    optimizePackageImports: ["lucide-react"],
   },
-  
+
   // Special config for Netlify
   env: {
     NETLIFY: process.env.NETLIFY,

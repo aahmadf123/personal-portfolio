@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { getFeaturedProjects } from "@/lib/project-service";
+import { revalidateTag } from "next/cache";
 
-export const revalidate = 3600;
+// Set short revalidation time for dynamic data
+export const revalidate = 60; // Revalidate every 60 seconds
 
 // Generate static params for just the default case
 export const generateStaticParams = async () => {
@@ -10,47 +12,24 @@ export const generateStaticParams = async () => {
 
 export async function GET(request: Request) {
   try {
-    // Use a fixed limit for static generation
-    const limit = 3; // Fixed limit for featured projects on static pages
+    // Extract limit from query string if needed
+    const url = new URL(request.url);
+    const limit = url.searchParams.get("limit")
+      ? parseInt(url.searchParams.get("limit") as string, 10)
+      : 3;
 
-    const supabase = createServerSupabaseClient();
+    // Get featured projects using project-service to maintain consistency
+    // This ensures the same data source is used for both featured and all projects
+    const featuredProjects = await getFeaturedProjects(limit);
 
-    const { data, error } = await supabase
-      .from("projects")
-      .select(
-        `
-        id,
-        title,
-        slug,
-        description,
-        summary,
-        thumbnail_url,
-        main_image_url,
-        image_url,
-        github_url,
-        demo_url,
-        is_featured,
-        status,
-        completion,
-        start_date,
-        end_date,
-        tags,
-        technologies
-      `
-      )
-      .eq("is_featured", true)
-      .order("priority", { ascending: false })
-      .limit(limit);
+    // Add a cache tag for revalidation
+    revalidateTag("projects");
 
-    if (error) {
-      console.error("Error fetching featured projects:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    // Log the data to help with debugging
-    console.log("Featured projects from database:", data);
-
-    return NextResponse.json(data);
+    return NextResponse.json(featuredProjects, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
+    });
   } catch (error) {
     console.error("Error in featured projects API:", error);
     return NextResponse.json(

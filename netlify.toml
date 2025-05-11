@@ -12,6 +12,26 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Handle Next.js static and JavaScript chunks
+[[redirects]]
+  from = "/_next/static/*"
+  to = "/_next/static/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/_next/data/*"
+  to = "/_next/data/:splat"
+  status = 200
+  force = true
+
+# Add these high-priority redirects for page chunks
+[[redirects]]
+  from = "/_next/*"
+  to = "/_next/:splat"
+  status = 200
+  force = true
+
 # Explicitly handle the root path
 [[redirects]]
   from = "/"
@@ -19,10 +39,22 @@
   status = 200
   force = true
 
-# Handle Next.js static files
+# Dynamic content pages (with higher priority)
 [[redirects]]
-  from = "/_next/static/*"
-  to = "/_next/static/:splat"
+  from = "/projects/*"
+  to = "/.netlify/functions/nextjs-server/projects/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/blog/*"
+  to = "/.netlify/functions/nextjs-server/blog/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/research/*"
+  to = "/.netlify/functions/nextjs-server/research/:splat"
   status = 200
   force = true
 
@@ -56,22 +88,6 @@
 [[redirects]]
   from = "/admin/*"
   to = "/.netlify/functions/nextjs-server/admin/:splat"
-  status = 200
-
-# Dynamic content pages
-[[redirects]]
-  from = "/projects/*"
-  to = "/.netlify/functions/nextjs-server/projects/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/blog/*"
-  to = "/.netlify/functions/nextjs-server/blog/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/research/*"
-  to = "/.netlify/functions/nextjs-server/research/:splat"
   status = 200
 
 # Timeline route specifically

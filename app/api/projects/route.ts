@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getAllProjects, getFeaturedProjects } from "@/lib/project-service";
+import { revalidateTag } from "next/cache";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 60; // Revalidate every 60 seconds
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,11 +18,14 @@ export async function GET(request: NextRequest) {
       ? await getFeaturedProjects(limit)
       : await getAllProjects();
 
-    // If limit is specified and featured is not true, apply the limit here
-    const limitedProjects =
-      limit && !featured ? projects.slice(0, limit) : projects;
+    // Add a cache tag for revalidation
+    revalidateTag("projects");
 
-    return NextResponse.json({ data: limitedProjects });
+    return NextResponse.json(projects, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
+    });
   } catch (error) {
     console.error("Error fetching projects:", error);
     return NextResponse.json(

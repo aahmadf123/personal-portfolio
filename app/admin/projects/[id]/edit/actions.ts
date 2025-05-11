@@ -31,6 +31,7 @@ export async function updateProject(
   const role = formData.get("role") as string;
   const team_size = Number.parseInt(formData.get("team_size") as string) || 1;
   const detailed_description = formData.get("detailed_description") as string;
+  const is_featured = formData.get("is_featured") === "true";
 
   // Process arrays
   const key_achievements = formData.get("key_achievements") as string;
@@ -66,6 +67,7 @@ export async function updateProject(
       detailed_description,
       key_achievements: key_achievements_array,
       technologies: technologies_array,
+      is_featured,
       updated_at: new Date().toISOString(),
     })
     .eq("id", projectId);

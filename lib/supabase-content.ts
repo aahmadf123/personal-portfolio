@@ -181,36 +181,78 @@ export async function getFeaturedProjects(): Promise<Project[]> {
     throw error;
   }
 
-  // Process image URLs
-  return data.map((project) => ({
-    ...project,
-    id: project.id.toString(),
-    image_url: transformStorageUrl(
-      project.main_image_url || project.thumbnail_url
-    ),
-    technologies: project.project_technologies
-      ? project.project_technologies.map((tech: any) => tech.name)
-      : [],
-    tags: project.project_tags
-      ? project.project_tags.map((tag: any) => tag.name)
-      : [],
-    images: project.project_images
-      ? project.project_images.map((img: any) => ({
-          url: transformStorageUrl(img.url),
-          alt: img.alt_text || project.title,
-          caption: img.caption || "",
-        }))
-      : [],
-    featured: project.is_featured,
-    completion:
-      project.status === "completed"
-        ? 100
-        : project.status === "in-progress"
-        ? 50
-        : project.status === "planned"
-        ? 0
-        : 75,
-  }));
+  if (!data || !Array.isArray(data)) {
+    return [];
+  }
+
+  // Process projects with consistent image handling
+  return data.map((project) => {
+    try {
+      // Find main image from project_images if it exists
+      const mainImage = project.project_images?.find((img: any) => img.is_main);
+      const thumbnailUrl = project.thumbnail_url || null;
+      const mainImageUrl = mainImage?.url || project.main_image_url || null;
+
+      // Process image URLs consistently
+      const processedThumbnail = thumbnailUrl
+        ? transformStorageUrl(thumbnailUrl)
+        : null;
+      const processedMainImage = mainImageUrl
+        ? transformStorageUrl(mainImageUrl)
+        : null;
+
+      // Calculate image_url from available sources without using fallbacks
+      const imageUrl = processedThumbnail || processedMainImage;
+
+      return {
+        ...project,
+        id: project.id.toString(),
+        thumbnail_url: processedThumbnail,
+        main_image_url: processedMainImage,
+        image_url: imageUrl,
+        technologies: project.project_technologies
+          ? project.project_technologies.map((tech: any) => tech.name)
+          : [],
+        tags: project.project_tags
+          ? project.project_tags.map((tag: any) => tag.name)
+          : [],
+        images: project.project_images
+          ? project.project_images.map((img: any) => ({
+              url: img.url ? transformStorageUrl(img.url) : null,
+              alt: img.alt_text || project.title,
+              caption: img.caption || "",
+            }))
+          : [],
+        featured: project.is_featured,
+        completion:
+          project.status === "completed"
+            ? 100
+            : project.status === "in-progress"
+            ? 50
+            : project.status === "planned"
+            ? 0
+            : 75,
+      };
+    } catch (err) {
+      console.error(
+        `Error processing featured project data for ID ${project.id}:`,
+        err
+      );
+      // Return basic project data if processing failed
+      return {
+        ...project,
+        id: project.id.toString(),
+        thumbnail_url: null,
+        main_image_url: null,
+        image_url: null,
+        technologies: [],
+        tags: [],
+        images: [],
+        featured: project.is_featured,
+        completion: 0,
+      };
+    }
+  });
 }
 
 // Organizations

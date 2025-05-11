@@ -18,7 +18,7 @@ export function checkRequiredEnvVars() {
   const optionalVars = [
     {
       name: "NEXT_PUBLIC_SUPABASE_BUCKET",
-      description: 'Storage bucket name (defaults to "portfolio-bucket")',
+      description: 'Storage bucket name (defaults to "profolio-bucket")',
     },
     {
       name: "DATABASE_URL",

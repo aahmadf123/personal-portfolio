@@ -15,7 +15,12 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
 
 @layer base {
@@ -50,6 +55,46 @@ body {
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Responsive images */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Improved responsive containers */
+  .container {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-right: 1.5rem;
+      padding-left: 1.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      padding-right: 2rem;
+      padding-left: 2rem;
+    }
+  }
+
+  /* Prevent text size adjustment on orientation change */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 }
 
@@ -124,7 +169,12 @@ html {
   left: 0;
   height: 2px;
   width: 100%;
-  background: linear-gradient(to right, rgb(var(--primary)), rgb(var(--secondary)), rgb(var(--tertiary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--primary)),
+    rgb(var(--secondary)),
+    rgb(var(--tertiary))
+  );
   border-radius: 1px;
   animation: slideIn 0.3s ease forwards;
   transform-origin: left;
@@ -169,7 +219,11 @@ html {
 
 /* Custom background gradient */
 .bg-radial-gradient {
-  background: radial-gradient(circle at center, rgba(30, 41, 59, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(30, 41, 59, 0.5) 0%,
+    rgba(0, 0, 0, 0) 70%
+  );
 }
 
 /* Color utility classes */
@@ -178,36 +232,66 @@ html {
 }
 
 .text-gradient-vibrant {
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--accent)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--accent)),
+    rgb(var(--secondary))
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .text-gradient-warm {
-  background: linear-gradient(to right, rgb(var(--accent)), rgb(var(--secondary)), rgb(var(--primary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--accent)),
+    rgb(var(--secondary)),
+    rgb(var(--primary))
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .text-gradient-cool {
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--quaternary)), rgb(var(--primary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--quaternary)),
+    rgb(var(--primary))
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .bg-gradient-vibrant {
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--accent)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--accent)),
+    rgb(var(--secondary))
+  );
 }
 
 .bg-gradient-warm {
-  background: linear-gradient(to right, rgb(var(--accent)), rgb(var(--secondary)), rgb(var(--primary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--accent)),
+    rgb(var(--secondary)),
+    rgb(var(--primary))
+  );
 }
 
 .bg-gradient-cool {
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--quaternary)), rgb(var(--primary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--quaternary)),
+    rgb(var(--primary))
+  );
 }
 
 .gradient-bg {
@@ -266,7 +350,12 @@ html {
 
   .section-title {
     @apply text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4;
-    background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--accent)), rgb(var(--secondary)));
+    background: linear-gradient(
+      to right,
+      rgb(var(--tertiary)),
+      rgb(var(--accent)),
+      rgb(var(--secondary))
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -383,11 +472,6 @@ html {
   @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
 }
 
-/* Prevent text size adjustment on orientation change */
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
 /* Smooth scrolling with reduced motion preference support */
 @media (prefers-reduced-motion: no-preference) {
   html {
@@ -425,7 +509,12 @@ img {
 
 .section-title {
   @apply text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4;
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--accent)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--accent)),
+    rgb(var(--secondary))
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -440,7 +529,12 @@ img {
 }
 
 .gradient-text-expanded {
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--primary)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--primary)),
+    rgb(var(--secondary))
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -506,7 +600,11 @@ img {
 
 /* Futuristic grid pattern */
 .bg-grid-pattern {
-  background-image: linear-gradient(to right, rgba(var(--primary), 0.1) 1px, transparent 1px),
+  background-image: linear-gradient(
+      to right,
+      rgba(var(--primary), 0.1) 1px,
+      transparent 1px
+    ),
     linear-gradient(to bottom, rgba(var(--primary), 0.1) 1px, transparent 1px);
   background-size: 30px 30px;
 }
@@ -538,7 +636,12 @@ img {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   animation: shine 3s infinite;
 }
 
@@ -601,7 +704,12 @@ img {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.1) 40%, transparent 60%);
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.1) 40%,
+    transparent 60%
+  );
   transform: translateX(-100%);
   transition: transform 0.6s;
 }
@@ -778,26 +886,46 @@ html:has(.custom-cursor) * {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--secondary))
+  );
   transform-origin: 0%;
   z-index: 1000;
 }
 
 /* Colorful section backgrounds */
 .bg-section-primary {
-  background: linear-gradient(135deg, rgba(160, 120, 255, 0.05) 0%, rgba(160, 120, 255, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(160, 120, 255, 0.05) 0%,
+    rgba(160, 120, 255, 0.1) 100%
+  );
 }
 
 .bg-section-secondary {
-  background: linear-gradient(135deg, rgba(255, 20, 147, 0.05) 0%, rgba(255, 20, 147, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 20, 147, 0.05) 0%,
+    rgba(255, 20, 147, 0.1) 100%
+  );
 }
 
 .bg-section-tertiary {
-  background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 255, 255, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 255, 0.05) 0%,
+    rgba(0, 255, 255, 0.1) 100%
+  );
 }
 
 .bg-section-accent {
-  background: linear-gradient(135deg, rgba(255, 165, 0, 0.05) 0%, rgba(255, 165, 0, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 165, 0, 0.05) 0%,
+    rgba(255, 165, 0, 0.1) 100%
+  );
 }
 
 /* Hover underline animation */
@@ -813,7 +941,11 @@ html:has(.custom-cursor) * {
   height: 2px;
   bottom: -4px;
   left: 0;
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--secondary))
+  );
   transform-origin: bottom right;
   transition: transform 0.3s ease-out;
 }
@@ -839,7 +971,12 @@ html:has(.custom-cursor) * {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--primary)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--primary)),
+    rgb(var(--secondary))
+  );
 }
 
 /* Card variants */
@@ -848,7 +985,11 @@ html:has(.custom-cursor) * {
 }
 
 .card-cool::before {
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgb(var(--quaternary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgb(var(--quaternary))
+  );
 }
 
 .card-warm {
@@ -856,7 +997,11 @@ html:has(.custom-cursor) * {
 }
 
 .card-warm::before {
-  background: linear-gradient(to right, rgb(var(--accent)), rgb(var(--secondary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--accent)),
+    rgb(var(--secondary))
+  );
 }
 
 .card-vibrant {
@@ -864,28 +1009,52 @@ html:has(.custom-cursor) * {
 }
 
 .card-vibrant::before {
-  background: linear-gradient(to right, rgb(var(--secondary)), rgb(var(--primary)));
+  background: linear-gradient(
+    to right,
+    rgb(var(--secondary)),
+    rgb(var(--primary))
+  );
 }
 
 /* Progress bar color variants */
 .progress-primary {
-  background: linear-gradient(to right, rgb(var(--primary)), rgba(var(--primary), 0.7));
+  background: linear-gradient(
+    to right,
+    rgb(var(--primary)),
+    rgba(var(--primary), 0.7)
+  );
 }
 
 .progress-secondary {
-  background: linear-gradient(to right, rgb(var(--secondary)), rgba(var(--secondary), 0.7));
+  background: linear-gradient(
+    to right,
+    rgb(var(--secondary)),
+    rgba(var(--secondary), 0.7)
+  );
 }
 
 .progress-tertiary {
-  background: linear-gradient(to right, rgb(var(--tertiary)), rgba(var(--tertiary), 0.7));
+  background: linear-gradient(
+    to right,
+    rgb(var(--tertiary)),
+    rgba(var(--tertiary), 0.7)
+  );
 }
 
 .progress-quaternary {
-  background: linear-gradient(to right, rgb(var(--quaternary)), rgba(var(--quaternary), 0.7));
+  background: linear-gradient(
+    to right,
+    rgb(var(--quaternary)),
+    rgba(var(--quaternary), 0.7)
+  );
 }
 
 .progress-accent {
-  background: linear-gradient(to right, rgb(var(--accent)), rgba(var(--accent), 0.7));
+  background: linear-gradient(
+    to right,
+    rgb(var(--accent)),
+    rgba(var(--accent), 0.7)
+  );
 }
 
 /* Custom styles */
@@ -924,5 +1093,124 @@ html:has(.custom-cursor) * {
 @layer utilities {
   .scroll-snap-container {
     scroll-snap-type: y mandatory;
+  }
+
+  /* Additional responsive utility classes */
+  .safe-area-padding {
+    padding-left: env(safe-area-inset-left, 1rem);
+    padding-right: env(safe-area-inset-right, 1rem);
+    padding-top: env(safe-area-inset-top, 1rem);
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+
+  .safe-area-padding-horizontal {
+    padding-left: env(safe-area-inset-left, 1rem);
+    padding-right: env(safe-area-inset-right, 1rem);
+  }
+
+  .safe-area-padding-vertical {
+    padding-top: env(safe-area-inset-top, 1rem);
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+
+  /* Better touch targets for mobile */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Hide elements on specific screen sizes */
+  .xs-only {
+    @apply block sm:hidden;
+  }
+
+  .sm-only {
+    @apply hidden sm:block md:hidden;
+  }
+
+  .md-only {
+    @apply hidden md:block lg:hidden;
+  }
+
+  .lg-only {
+    @apply hidden lg:block xl:hidden;
+  }
+
+  .xl-only {
+    @apply hidden xl:block 2xl:hidden;
+  }
+
+  .hide-on-mobile {
+    @apply hidden md:block;
+  }
+
+  .show-on-mobile {
+    @apply block md:hidden;
+  }
+
+  /* Improved responsive containers */
+  .responsive-container {
+    @apply w-full px-4 sm:px-6 md:px-8 max-w-7xl mx-auto;
+  }
+
+  /* Responsive typography */
+  .responsive-heading {
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold;
+  }
+
+  .responsive-subheading {
+    @apply text-xl sm:text-2xl md:text-3xl font-semibold;
+  }
+
+  /* Orientation-specific classes */
+  @media (orientation: landscape) {
+    .show-on-landscape {
+      display: block;
+    }
+
+    .hide-on-landscape {
+      display: none;
+    }
+  }
+
+  @media (orientation: portrait) {
+    .show-on-portrait {
+      display: block;
+    }
+
+    .hide-on-portrait {
+      display: none;
+    }
+  }
+
+  /* Device-specific optimizations */
+  @media (max-width: 374px) {
+    .hide-on-very-small {
+      display: none;
+    }
+  }
+
+  /* Print optimization */
+  @media print {
+    .hide-on-print {
+      display: none;
+    }
+  }
+
+  /* Optimizations for foldable devices */
+  @media (spanning: single-fold-vertical) {
+    .fold-aware {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  @media (spanning: single-fold-horizontal) {
+    .fold-aware {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
   }
 }

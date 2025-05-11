@@ -1,5 +1,5 @@
-import type { Config } from "tailwindcss"
-import { fontFamily } from "tailwindcss/defaultTheme"
+import type { Config } from "tailwindcss";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 const config: Config = {
   darkMode: ["class"],
@@ -13,10 +13,35 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+        md: "2rem",
+      },
       screens: {
+        xs: "100%",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
         "2xl": "1400px",
       },
+    },
+    screens: {
+      xs: "375px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1400px",
+      "3xl": "1600px",
+      // Special device breakpoints
+      short: { raw: "(max-height: 667px)" },
+      tall: { raw: "(min-height: 800px)" },
+      // Device type breakpoints
+      touch: { raw: "(hover: none)" },
+      stylus: { raw: "(hover: none) and (pointer: coarse)" },
+      pointer: { raw: "(hover: hover)" },
     },
     extend: {
       colors: {
@@ -131,6 +156,6 @@ const config: Config = {
     "tailwindcss-animate",
     // Add any additional plugins here
   ],
-}
+};
 
-export default config
+export default config;

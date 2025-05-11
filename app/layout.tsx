@@ -59,9 +59,14 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  minimumScale: 1,
   userScalable: true,
-  themeColor: "#000000",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
   colorScheme: "dark light", // Support both color schemes
+  viewportFit: "cover", // Better support for notched phones
 };
 
 export const metadata: Metadata = {

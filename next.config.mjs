@@ -30,12 +30,8 @@ const nextConfig = {
       },
     ],
   },
-  // Use exportPathMap for better static generation with dynamic routes
-  // This ensures all JavaScript chunks are properly generated
-  exportPathMap: async function (defaultPathMap) {
-    // Preserve the default paths which includes the dynamic ones
-    return defaultPathMap;
-  },
+  // Note: For static paths in App Router, use generateStaticParams in your page components
+  // instead of exportPathMap which is only for Pages Router
 
   // Improve server component handling
   output: "standalone",

@@ -14,8 +14,18 @@ export function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn("Supabase URL or Anon Key not found, using fallback values");
+  // Use service role key for server-side operations, especially during build
+  const isServer = typeof window === "undefined";
+  const isNetlifyBuild = process.env.NETLIFY === "true";
+
+  // For server contexts or Netlify builds, prioritize using the service role key
+  const supabaseKey =
+    isServer || isNetlifyBuild
+      ? process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
+      : supabaseAnonKey;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn("Supabase URL or key not found, using fallback values");
     return createSupabaseClient(
       "https://example.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YW1wbGUiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTYxMzA5ODU0MCwiZXhwIjoxOTI4Njc0NTQwfQ.fallback-key-for-development"
@@ -25,14 +35,14 @@ export function createClient() {
   // Use singleton pattern for client-side to prevent multiple instances
   if (typeof window !== "undefined") {
     if (!clientClientInstance) {
-      clientClientInstance = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+      clientClientInstance = createSupabaseClient(supabaseUrl, supabaseKey);
     }
     return clientClientInstance;
   }
 
   // For server-side, create a new client each time
   // This is because server components might be rendered in parallel
-  return createSupabaseClient(supabaseUrl, supabaseAnonKey);
+  return createSupabaseClient(supabaseUrl, supabaseKey);
 }
 
 // Create a server-side Supabase client (for server components and API routes)

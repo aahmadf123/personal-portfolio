@@ -8,6 +8,11 @@
   # Better compatibility with Next.js 14
   NEXT_LOCATION = "/"
   NEXT_USE_NETLIFY_EDGE = "true"
+  # Ensure Supabase variables are available during build
+  NEXT_PUBLIC_SUPABASE_URL = "${NEXT_PUBLIC_SUPABASE_URL}"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = "${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+  SUPABASE_SERVICE_ROLE_KEY = "${SUPABASE_SERVICE_ROLE_KEY}"
+  NEXT_PUBLIC_SUPABASE_BUCKET = "profolio-bucket"
 
 # Configure the Netlify Next.js plugin
 [[plugins]]

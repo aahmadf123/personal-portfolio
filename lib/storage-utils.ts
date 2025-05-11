@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase";
+import { createServerSupabaseClient } from "@/lib/supabase";
 import { DEFAULT_BUCKET_NAME } from "./env-check";
 
 /**
@@ -112,7 +113,8 @@ export async function verifyStorageConfig() {
   try {
     console.log("Starting storage configuration verification...");
 
-    const supabase = createClient();
+    // Use server client with admin permissions to ensure we can list buckets
+    const supabase = createServerSupabaseClient();
 
     // Check if we can list the buckets
     console.log("Checking available storage buckets...");

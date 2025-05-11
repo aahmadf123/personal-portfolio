@@ -61,6 +61,8 @@ const nextConfig = {
   // Special config for Netlify
   env: {
     NETLIFY: process.env.NETLIFY,
+    // Make sure the service role key is available during build
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   },
 
   // Indicate which API routes should always be dynamic (not statically generated)

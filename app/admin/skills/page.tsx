@@ -1,30 +1,46 @@
-import { createClient } from "@/lib/supabase"
-import { DataTable } from "@/components/admin/data-table"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { deleteSkill } from "./actions"
+"use client";
 
-export default async function SkillsAdmin() {
-  const supabase = createClient()
+import { createClient } from "@/lib/supabase";
+import { DataTable } from "@/components/admin/data-table";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { deleteSkill } from "./actions";
+import { useEffect, useState } from "react";
+import { Skill } from "@/types/skills";
 
-  const { data: skills } = await supabase
-    .from("skills")
-    .select("*")
-    .order("category")
-    .order("level", { ascending: false })
+export default function SkillsAdmin() {
+  const [skills, setSkills] = useState<Skill[]>([]);
+
+  useEffect(() => {
+    async function fetchSkills() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("skills")
+        .select("*")
+        .order("category")
+        .order("level", { ascending: false });
+
+      setSkills(data || []);
+    }
+
+    fetchSkills();
+  }, []);
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8">Manage Skills</h1>
 
       <DataTable
-        data={skills || []}
+        data={skills}
         columns={[
           {
             key: "name",
             header: "Name",
             cell: (skill) => (
-              <Link href={`/admin/skills/${skill.id}/edit`} className="font-medium hover:underline">
+              <Link
+                href={`/admin/skills/${skill.id}/edit`}
+                className="font-medium hover:underline"
+              >
                 {skill.name}
               </Link>
             ),
@@ -35,7 +51,10 @@ export default async function SkillsAdmin() {
             cell: (skill) => (
               <Badge
                 variant="outline"
-                style={{ backgroundColor: `var(--${skill.color}-100)`, color: `var(--${skill.color}-800)` }}
+                style={{
+                  backgroundColor: `var(--${skill.color}-100)`,
+                  color: `var(--${skill.color}-800)`,
+                }}
               >
                 {skill.category}
               </Badge>
@@ -60,12 +79,16 @@ export default async function SkillsAdmin() {
             key: "featured",
             header: "Featured",
             cell: (skill) =>
-              skill.featured ? <Badge variant="default">Featured</Badge> : <span className="text-gray-500">-</span>,
+              skill.featured ? (
+                <Badge variant="default">Featured</Badge>
+              ) : (
+                <span className="text-gray-500">-</span>
+              ),
           },
         ]}
         createHref="/admin/skills/new"
         onDelete={deleteSkill}
       />
     </div>
-  )
+  );
 }

@@ -22,6 +22,14 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
   },
+  // Special config for Netlify
+  env: {
+    NETLIFY: process.env.NETLIFY,
+  },
+  // Force fully dynamic rendering for problematic routes
+  exportPathMap: async function (defaultPathMap) {
+    return defaultPathMap;
+  },
 };
 
 export default nextConfig;

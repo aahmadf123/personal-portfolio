@@ -22,11 +22,22 @@ const nextConfig = {
       },
     ],
   },
-  // Use standalone for server components, consider 'export' for fully static sites
+  // Use standalone for server components
   output: "standalone",
+  
+  // Improve Netlify integration
+  trailingSlash: false, // Ensure consistent URL handling
+  
+  // Improve static export handling
+  poweredByHeader: false,
+  
+  // Improve build process for Netlify
+  swcMinify: true,
+  
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
   },
+  
   // Special config for Netlify
   env: {
     NETLIFY: process.env.NETLIFY,

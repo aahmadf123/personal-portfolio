@@ -5,10 +5,19 @@
 [build.environment]
   NODE_VERSION = "20.11.1"
   NEXT_TELEMETRY_DISABLED = "1"
-  # NETLIFY_NEXT_PLUGIN_SKIP = "true" # Usually not recommended, let the plugin run
+  # Better compatibility with Next.js 14
+  NEXT_LOCATION = "/"
+  NEXT_USE_NETLIFY_EDGE = "true"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Explicitly handle the root path
+[[redirects]]
+  from = "/"
+  to = "/.netlify/functions/nextjs-server"
+  status = 200
+  force = true
 
 # Handle Next.js static files
 [[redirects]]
@@ -64,6 +73,13 @@
   from = "/research/*"
   to = "/.netlify/functions/nextjs-server/research/:splat"
   status = 200
+
+# Timeline route specifically
+[[redirects]]
+  from = "/timeline"
+  to = "/.netlify/functions/nextjs-server/timeline"
+  status = 200
+  force = true
 
 # Rewrite for other API routes
 [[redirects]]

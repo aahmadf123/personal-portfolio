@@ -61,7 +61,6 @@ const nextConfig = {
   // Special config for Netlify
   env: {
     NETLIFY: process.env.NETLIFY,
-    NETLIFY_NEXT_PLUGIN_SKIP: "true",
   },
 
   // Indicate which API routes should always be dynamic (not statically generated)

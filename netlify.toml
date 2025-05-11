@@ -12,11 +12,6 @@
 # Configure the Netlify Next.js plugin
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    # Enable server-side rendering
-    ssr = true
-    # Use Node.js server for Next.js
-    useServerlessTracing = true
 
 # Handle Next.js static and JavaScript chunks
 [[redirects]]

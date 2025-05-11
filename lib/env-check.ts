@@ -76,4 +76,4 @@ export function checkRequiredEnvVars() {
 
 // Export the default bucket name
 export const DEFAULT_BUCKET_NAME =
-  process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-bucket";
+  process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "profolio-bucket";

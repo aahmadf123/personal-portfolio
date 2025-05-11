@@ -455,44 +455,17 @@ export async function getTimelineEvents() {
   return data;
 }
 
-// Case studies
+// Case studies - mock implementation since table doesn't exist
 export async function getCaseStudies() {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("case_studies")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching case studies:", error);
-    throw error;
-  }
-
-  // Process image URLs
-  return data.map((study) => ({
-    ...study,
-    cover_image: transformStorageUrl(study.cover_image),
-  }));
+  console.log(
+    "Using mock implementation for case studies - table doesn't exist"
+  );
+  return [];
 }
 
 export async function getCaseStudyBySlug(slug: string) {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("case_studies")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (error) {
-    console.error(`Error fetching case study with slug ${slug}:`, error);
-    throw error;
-  }
-
-  if (!data) return null;
-
-  // Process image URL
-  return {
-    ...data,
-    cover_image: transformStorageUrl(data.cover_image),
-  };
+  console.log(
+    `Using mock implementation for case study ${slug} - table doesn't exist`
+  );
+  return null;
 }

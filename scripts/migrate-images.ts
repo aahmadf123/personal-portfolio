@@ -16,7 +16,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 // Constants
-const BUCKET_NAME = "portfolio-bucket";
+const BUCKET_NAME = "profolio-bucket";
 const TEMP_DIR = path.join(process.cwd(), "temp-images");
 const VERCEL_URLS_FILE = path.join(process.cwd(), "vercel-image-urls.txt");
 

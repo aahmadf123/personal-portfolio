@@ -1,75 +1,20 @@
 "use client";
 
-import { createClient } from "@/lib/supabase";
-import { DataTable } from "@/components/admin/data-table";
-import { formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { deleteCaseStudy } from "./actions";
-import { useEffect, useState } from "react";
-
-interface CaseStudy {
-  id: number;
-  title: string;
-  featured: boolean;
-  created_at: string;
-}
-
 export default function CaseStudiesAdmin() {
-  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
-
-  useEffect(() => {
-    async function fetchCaseStudies() {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("case_studies")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      setCaseStudies(data || []);
-    }
-
-    fetchCaseStudies();
-  }, []);
-
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8">Manage Case Studies</h1>
 
-      <DataTable
-        data={caseStudies}
-        columns={[
-          {
-            key: "title",
-            header: "Title",
-            cell: (caseStudy) => (
-              <Link
-                href={`/admin/case-studies/${caseStudy.id}/edit`}
-                className="font-medium hover:underline"
-              >
-                {caseStudy.title}
-              </Link>
-            ),
-          },
-          {
-            key: "featured",
-            header: "Featured",
-            cell: (caseStudy) =>
-              caseStudy.featured ? (
-                <Badge variant="default">Featured</Badge>
-              ) : (
-                <span className="text-gray-500">-</span>
-              ),
-          },
-          {
-            key: "created_at",
-            header: "Created",
-            cell: (caseStudy) => formatDate(caseStudy.created_at),
-          },
-        ]}
-        createHref="/admin/case-studies/new"
-        onDelete={deleteCaseStudy}
-      />
+      <div className="p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h2 className="text-xl font-semibold text-yellow-700 mb-2">
+          Feature Not Implemented
+        </h2>
+        <p className="text-yellow-600">
+          Case studies functionality is not currently implemented in this
+          application. The database table 'case_studies' does not exist in the
+          schema.
+        </p>
+      </div>
     </div>
   );
 }

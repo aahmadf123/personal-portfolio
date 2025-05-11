@@ -53,8 +53,7 @@ export default async function EditProjectPage({
     .eq("project_id", project.id)
     .order("due_date");
 
-  const handleUpdateProject = async (formData: FormData) => {
-    "use server";
+  const handleUpdateProject = (formData: FormData) => {
     return updateProject(project.id, selectedTagIds, formData);
   };
 

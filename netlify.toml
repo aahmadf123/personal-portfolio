@@ -14,16 +14,9 @@
   # Force pnpm to update lock file if needed
   NPM_FLAGS = "--no-frozen-lockfile"
 
-# Configure the Netlify Next.js plugin
+# Configure the Netlify Next.js plugin (v5.11.1)
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    # Enable Edge Functions for middleware and server components
-    enable_edge_functions = true
-    # This ensures Edge-compliant middleware is used
-    use_edge_middleware = true
-    # Ensures all Next.js server components use edge functions
-    deploy_edge_functions = true
 
 # Handle Next.js static and JavaScript chunks
 [[redirects]]

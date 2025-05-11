@@ -4,13 +4,10 @@ import { getFeaturedProjects } from "@/lib/project-service";
 // Set short revalidation time for dynamic data
 export const revalidate = 60; // Revalidate every 60 seconds
 
-// Generate static params for the default case and a couple common limits
+// Generate static params for ISR
 export const generateStaticParams = async () => {
-  return [
-    {}, // Default params (limit=3)
-    { limit: "4" },
-    { limit: "6" },
-  ];
+  // Return a default limit for static generation
+  return [{}];
 };
 
 export async function GET(request: Request) {

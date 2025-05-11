@@ -37,15 +37,26 @@ export async function getProjects(): Promise<Project[]> {
   // Process image URLs and transform data to match expected Project type
   return data.map((project) => {
     try {
+      // Calculate image URL from existing fields - don't rely on image_url column
+      const imageUrl =
+        project.main_image_url || project.thumbnail_url
+          ? transformStorageUrl(project.main_image_url || project.thumbnail_url)
+          : null;
+
+      // Calculate completion based on status
+      const completion =
+        project.status === "completed"
+          ? 100
+          : project.status === "in-progress"
+          ? 50
+          : project.status === "planned"
+          ? 0
+          : 75;
+
       return {
         ...project,
         id: project.id.toString(),
-        image_url:
-          project.main_image_url || project.thumbnail_url
-            ? transformStorageUrl(
-                project.main_image_url || project.thumbnail_url
-              )
-            : null,
+        image_url: imageUrl,
         technologies: Array.isArray(project.project_technologies)
           ? project.project_technologies.map((tech: any) => tech.name)
           : [],
@@ -60,14 +71,7 @@ export async function getProjects(): Promise<Project[]> {
             }))
           : [],
         featured: project.is_featured || false,
-        completion:
-          project.status === "completed"
-            ? 100
-            : project.status === "in-progress"
-            ? 50
-            : project.status === "planned"
-            ? 0
-            : 75,
+        completion: completion,
       };
     } catch (err) {
       console.error(`Error processing project data for ID ${project.id}:`, err);

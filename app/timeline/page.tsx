@@ -15,8 +15,14 @@ export const revalidate = 86400;
 
 async function getTimelineEntries() {
   try {
-    // Use a relative URL path for static builds
-    const apiUrl = "/api/timeline";
+    // Use a different URL approach for Netlify builds
+    let apiUrl = "/api/timeline";
+
+    // For Netlify builds, we need to ensure URL parsing works
+    if (process.env.NETLIFY === "true") {
+      // Add base URL for static builds to avoid URL parsing errors
+      apiUrl = "http://localhost/api/timeline";
+    }
 
     // Fetch timeline data from API
     const res = await fetch(apiUrl, {

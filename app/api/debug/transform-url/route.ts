@@ -9,11 +9,9 @@ import { transformStorageUrl } from "@/lib/storage-utils";
 // Make this API route dynamic (not statically generated)
 export const dynamic = "force-dynamic";
 
-// For Netlify static builds, generate a stub response
+// For static builds, we'll add a generateStaticParams function
 export const generateStaticParams = async () => {
-  // This route doesn't make sense to pre-render, but we need to
-  // provide a valid response for static builds
-  return [{}];
+  return [{}]; // Default params
 };
 
 export async function GET(request: NextRequest) {

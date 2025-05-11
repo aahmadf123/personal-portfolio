@@ -4,13 +4,10 @@ import { getFeaturedResearchProjects } from "@/lib/research-project-service";
 // Enable ISR instead of forcing dynamic
 export const revalidate = 3600; // Revalidate every hour
 
-// Generate static params for common usage patterns
+// Generate static params for ISR
 export const generateStaticParams = async () => {
-  return [
-    {}, // Default params (limit=3)
-    { limit: "4" },
-    { limit: "6" },
-  ];
+  // Return default params for static generation
+  return [{}];
 };
 
 export async function GET(request: NextRequest) {

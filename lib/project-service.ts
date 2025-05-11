@@ -35,6 +35,16 @@ function processProjectData(project: any): Project {
   const startDate = project.start_date ? new Date(project.start_date) : null;
   const endDate = project.end_date ? new Date(project.end_date) : null;
 
+  // Calculate completion based on status
+  const completion =
+    project.status === "completed"
+      ? 100
+      : project.status === "in-progress"
+      ? 50
+      : project.status === "planned"
+      ? 0
+      : 75;
+
   return {
     ...project,
     tags,
@@ -45,7 +55,7 @@ function processProjectData(project: any): Project {
     start_date: startDate ? startDate.toISOString() : null,
     end_date: endDate ? endDate.toISOString() : null,
     // Ensure these fields exist with defaults if needed
-    completion: project.completion || 100,
+    completion: completion,
     priority: project.priority || "medium",
     is_featured: project.is_featured || false,
   };
@@ -99,8 +109,8 @@ export async function getFeaturedProjects(limit = 3): Promise<Project[]> {
         .select(
           `
           id, title, slug, description, summary, 
-          github_url, demo_url, video_url, status, completion,
-          start_date, end_date, category, is_featured, priority, order_index,
+          github_url, demo_url, video_url, status,
+          start_date, end_date, category, is_featured, order_index,
           thumbnail_url, main_image_url,
           project_tags (*),
           project_technologies (*),

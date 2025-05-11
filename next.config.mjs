@@ -14,6 +14,11 @@ const nextConfig = {
       process.env.SUPABASE_PROJECT_URL || "your-project-id.supabase.co",
       "h4rxhagyxlojdl32.public.blob.vercel-storage.com", // Add Vercel Blob storage
       "supabase-violet-tree.supabase.co", // Add your Supabase storage directly
+      "lknrbdxbdhuwlelrmszq.supabase.co",
+      "assets.vercel.com",
+      "github.com",
+      "raw.githubusercontent.com",
+      "images.unsplash.com",
     ],
     remotePatterns: [
       {
@@ -56,6 +61,7 @@ const nextConfig = {
   // Special config for Netlify
   env: {
     NETLIFY: process.env.NETLIFY,
+    NETLIFY_NEXT_PLUGIN_SKIP: "true",
   },
 
   // Indicate which API routes should always be dynamic (not statically generated)

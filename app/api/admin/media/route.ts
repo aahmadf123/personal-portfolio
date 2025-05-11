@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase";
 
-const BUCKET_NAME = "portfolio-bucket";
+const BUCKET_NAME = "profolio-bucket";
 const MEDIA_FOLDER = "media";
 
 export async function GET(request: NextRequest) {

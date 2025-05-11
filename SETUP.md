@@ -41,7 +41,7 @@ npm run migrate-images
 
 This will:
 
-- Create a `portfolio-bucket` in your Supabase Storage if it doesn't exist
+- Create a `profolio-bucket` in your Supabase Storage if it doesn't exist
 - Download each image from Vercel Blob
 - Upload it to Supabase Storage
 - Generate a mapping file so you can see which URLs have changed

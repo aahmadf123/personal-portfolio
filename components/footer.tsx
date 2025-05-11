@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Github, Linkedin, VideoIcon as Vimeo } from "lucide-react"
-import styles from "./footer.module.css"
+import Link from "next/link";
+import { Github, Linkedin, VideoIcon as Vimeo } from "lucide-react";
+import styles from "./footer.module.css";
+
+// Resume URL from Supabase storage
+const RESUME_URL =
+  "https://lknrbdxbdhuwlelrmszq.supabase.co/storage/v1/object/public/profolio-bucket//AhmadFirasAzfarAhmadFerRouse%20-%20Resume%20MAY25.pdf";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   // Social media URLs from environment variables
-  const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL || "https://github.com"
-  const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL || "https://linkedin.com"
-  const twitterUrl = process.env.NEXT_PUBLIC_TWITTER_URL || "https://twitter.com"
+  const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL || "https://github.com";
+  const linkedinUrl =
+    process.env.NEXT_PUBLIC_LINKEDIN_URL || "https://linkedin.com";
+  const twitterUrl =
+    process.env.NEXT_PUBLIC_TWITTER_URL || "https://twitter.com";
 
   return (
     <footer className={styles.footer}>
@@ -20,8 +26,9 @@ export function Footer() {
           <div className={styles.aboutSection}>
             <h3 className={styles.sectionTitle}>Ahmad Firas Azfar</h3>
             <p className={styles.aboutText}>
-              Computer Science and Engineering student with a passion for AI, data science, and quantum computing.
-              Building innovative solutions to complex problems.
+              Computer Science and Engineering student with a passion for AI,
+              data science, and quantum computing. Building innovative solutions
+              to complex problems.
             </p>
             <div className={styles.socialLinks}>
               <a
@@ -116,7 +123,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className={styles.link}>
+                <a
+                  href={RESUME_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.link}
+                >
                   Resume
                 </a>
               </li>
@@ -125,12 +137,14 @@ export function Footer() {
         </div>
 
         <div className={styles.footerBottom}>
-          <p className={styles.copyright}>&copy; {currentYear} Ahmad Firas Azfar. All rights reserved.</p>
+          <p className={styles.copyright}>
+            &copy; {currentYear} Ahmad Firas Azfar. All rights reserved.
+          </p>
           <div className={styles.techStack}>
             <span>Built with Next.js, Tailwind CSS, and Framer Motion</span>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

@@ -482,10 +482,10 @@ This project not only showcases my web development skills but also demonstrates 
         { id: 18, name: "Supabase", created_at: "2023-01-01T00:00:00Z" },
       ],
     },
-    "cheme-car-competition": {
+    "cheme-car-competition-project": {
       id: 4,
       title: "ChemE Car Competition Project",
-      slug: "cheme-car-competition",
+      slug: "cheme-car-competition-project",
       description:
         "Interdisciplinary project developing a chemically powered car for the AIChE ChemE Car Competition.",
       detailed_description: `## Project Overview
@@ -659,6 +659,6 @@ export async function getAllProjectSlugs(): Promise<string[]> {
     "homeowner-loss-history-prediction",
     "security-data-tool",
     "ai-powered-portfolio",
-    "cheme-car-competition",
+    "cheme-car-competition-project",
   ];
 }

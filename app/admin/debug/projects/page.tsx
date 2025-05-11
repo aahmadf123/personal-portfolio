@@ -1,11 +1,16 @@
-import { debugProjectImages, getProjectWithImages } from "@/lib/debug-project-images"
+import {
+  debugProjectImages,
+  getProjectWithImages,
+} from "@/lib/debug-project-images";
 
 export default async function DebugProjectsPage() {
   // Debug the ChemE Car project
-  const chemeCarProject = await debugProjectImages("cheme-car-project")
+  const chemeCarProject = await debugProjectImages(
+    "cheme-car-competition-project"
+  );
 
   // Get all projects
-  const allProjects = await getProjectWithImages()
+  const allProjects = await getProjectWithImages();
 
   return (
     <div className="p-8">
@@ -24,7 +29,9 @@ export default async function DebugProjectsPage() {
         </div>
 
         <div className="bg-muted p-4 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">All Projects (Image URLs)</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            All Projects (Image URLs)
+          </h2>
           {allProjects.length > 0 ? (
             <div className="grid gap-4">
               {allProjects.map((project) => (
@@ -32,7 +39,9 @@ export default async function DebugProjectsPage() {
                   <h3 className="font-medium">
                     {project.title} (slug: {project.slug})
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-2">Featured: {project.is_featured ? "Yes" : "No"}</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Featured: {project.is_featured ? "Yes" : "No"}
+                  </p>
                   <div className="space-y-1 text-sm">
                     <p>thumbnail_url: {project.thumbnail_url || "none"}</p>
                     <p>main_image_url: {project.main_image_url || "none"}</p>
@@ -47,5 +56,5 @@ export default async function DebugProjectsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,14 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { ArrowRight, Download } from "lucide-react"
-import styles from "./about.module.css"
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, Download } from "lucide-react";
+import styles from "./about.module.css";
+
+// Resume URL from Supabase storage
+const RESUME_URL =
+  "https://lknrbdxbdhuwlelrmszq.supabase.co/storage/v1/object/public/profolio-bucket//AhmadFirasAzfarAhmadFerRouse%20-%20Resume%20MAY25.pdf";
 
 export function About() {
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <section id="about" className={styles.aboutSection}>
@@ -43,20 +47,26 @@ export function About() {
           >
             <h2 className={styles.sectionTitle}>About Me</h2>
             <p className={styles.sectionSubtitle}>
-              Computer Science & Engineering Student exploring AI, Autonomy, and Next-Gen Technologies
+              Computer Science & Engineering Student exploring AI, Autonomy, and
+              Next-Gen Technologies
             </p>
 
             <p className={styles.paragraph}>
-              Hi, I'm <span className={styles.highlightText}>Ahmad Firas Azfar</span>, a Computer Science and
-              Engineering student with a passion for Artificial Intelligence, Data Science, and Software Engineering. I
-              focus on building intelligent systems that solve real-world problems with elegance and efficiency.
+              Hi, I'm{" "}
+              <span className={styles.highlightText}>Ahmad Firas Azfar</span>, a
+              Computer Science and Engineering student with a passion for
+              Artificial Intelligence, Data Science, and Software Engineering. I
+              focus on building intelligent systems that solve real-world
+              problems with elegance and efficiency.
             </p>
 
             <p className={styles.paragraph}>
-              While I'm still early in my journey with quantum computing, I'm deeply curious about its potential. My
-              interests span AI-driven autonomy, drone systems, and interdisciplinary approaches that merge software,
-              data, and human insight. I believe in learning fast, building boldly, and creating technologies that shape
-              the future.
+              While I'm still early in my journey with quantum computing, I'm
+              deeply curious about its potential. My interests span AI-driven
+              autonomy, drone systems, and interdisciplinary approaches that
+              merge software, data, and human insight. I believe in learning
+              fast, building boldly, and creating technologies that shape the
+              future.
             </p>
 
             <div className={styles.statsList}>
@@ -79,7 +89,12 @@ export function About() {
             </div>
 
             <div className={styles.buttonContainer}>
-              <Link href="/resume.pdf" target="_blank" rel="noopener noreferrer" className={styles.primaryButton}>
+              <Link
+                href={RESUME_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.primaryButton}
+              >
                 <Download className="h-4 w-4" />
                 Download Resume
               </Link>
@@ -92,5 +107,5 @@ export function About() {
         </div>
       </div>
     </section>
-  )
+  );
 }

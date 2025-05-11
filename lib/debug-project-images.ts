@@ -1,6 +1,8 @@
 import { createServerSupabaseClient } from "./supabase";
 
-export async function debugProjectImages(projectSlug = "cheme-car-project") {
+export async function debugProjectImages(
+  projectSlug = "cheme-car-competition-project"
+) {
   const supabase = createServerSupabaseClient();
 
   console.log(`Debugging image for project: ${projectSlug}`);

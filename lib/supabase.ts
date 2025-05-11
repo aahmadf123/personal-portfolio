@@ -1,4 +1,10 @@
+import { EventEmitter } from "events";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { createClient as createClientServer } from "@supabase/supabase-js";
+import { Database } from "@/types/supabase";
+
+// Increase max listeners to prevent warning during Netlify builds
+EventEmitter.defaultMaxListeners = 20;
 
 // Singleton pattern for Supabase clients
 let clientClientInstance: ReturnType<typeof createSupabaseClient> | null = null;

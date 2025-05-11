@@ -1,126 +1,131 @@
 /**
- * Performance optimization utilities
+ * Utility functions for performance optimization
  */
 
-// Debounce function to limit how often a function can be called
-export function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+/**
+ * Creates a debounced function that only invokes the provided function after a specified
+ * delay (in milliseconds) has passed without any new invocations.
+ *
+ * @param func The function to debounce
+ * @param wait The time in milliseconds to wait before invoking the function
+ * @returns A debounced version of the function
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  return (...args: Parameters<T>) => {
-    if (timeout) clearTimeout(timeout)
-    timeout = setTimeout(() => func(...args), wait)
-  }
+  return function debounced(this: any, ...args: Parameters<T>) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      func.apply(this, args);
+    }, wait);
+  };
 }
 
-// Throttle function to limit the rate at which a function is executed
-export function throttle<T extends (...args: any[]) => any>(func: T, limit: number): (...args: Parameters<T>) => void {
-  let inThrottle = false
+/**
+ * Creates a throttled function that only invokes the provided function at most once per
+ * specified time period (in milliseconds).
+ *
+ * @param func The function to throttle
+ * @param wait The time in milliseconds to throttle invocations
+ * @returns A throttled version of the function
+ */
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let lastCallTime = 0;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  return (...args: Parameters<T>) => {
-    if (!inThrottle) {
-      func(...args)
-      inThrottle = true
-      setTimeout(() => (inThrottle = false), limit)
+  return function throttled(this: any, ...args: Parameters<T>) {
+    const now = Date.now();
+    const timeSinceLastCall = now - lastCallTime;
+    const timeUntilNextCall = wait - timeSinceLastCall;
+
+    if (timeUntilNextCall <= 0) {
+      // If enough time has passed, call the function immediately
+      lastCallTime = now;
+      func.apply(this, args);
+    } else if (!timeoutId) {
+      // Schedule a call after the remaining time
+      timeoutId = setTimeout(() => {
+        lastCallTime = Date.now();
+        timeoutId = null;
+        func.apply(this, args);
+      }, timeUntilNextCall);
     }
-  }
+  };
 }
 
 // Request animation frame with fallback
-export function requestAnimationFrameWithFallback(callback: FrameRequestCallback): number {
+export function requestAnimationFrameWithFallback(
+  callback: FrameRequestCallback
+): number {
   if (typeof window !== "undefined") {
-    return window.requestAnimationFrame(callback)
+    return window.requestAnimationFrame(callback);
   }
-  return 0 // Fallback for SSR
+  return 0; // Fallback for SSR
 }
 
 // Cancel animation frame with fallback
 export function cancelAnimationFrameWithFallback(id: number): void {
   if (typeof window !== "undefined") {
-    window.cancelAnimationFrame(id)
+    window.cancelAnimationFrame(id);
   }
 }
 
 // Check if device is low-end based on device memory and hardware concurrency
 export function isLowEndDevice(): boolean {
-  if (typeof navigator === "undefined") return false
+  if (typeof navigator === "undefined") return false;
 
   // Check for device memory API (Chrome)
-  const lowMemory = "deviceMemory" in navigator && (navigator as any).deviceMemory < 4
+  const lowMemory =
+    "deviceMemory" in navigator && (navigator as any).deviceMemory < 4;
 
   // Check for hardware concurrency (number of logical processors)
-  const lowConcurrency = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4
+  const lowConcurrency =
+    navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
 
   // Check for connection type if available
   const slowConnection =
     "connection" in navigator &&
     (navigator as any).connection &&
     ((navigator as any).connection.saveData ||
-      ["slow-2g", "2g", "3g"].includes((navigator as any).connection.effectiveType))
+      ["slow-2g", "2g", "3g"].includes(
+        (navigator as any).connection.effectiveType
+      ));
 
-  return lowMemory || lowConcurrency || slowConnection
+  return lowMemory || lowConcurrency || slowConnection;
 }
 
 // Detect if reduced motion is preferred
 export function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
-}
-
-// Optimize rendering based on visibility
-export function optimizeForVisibility(element: HTMLElement | null, callback: () => void): () => void {
-  if (!element || typeof IntersectionObserver === "undefined") {
-    // Fallback if element is null or IntersectionObserver is not supported
-    callback()
-    return () => {}
-  }
-
-  let observer: IntersectionObserver
-  let isVisible = false
-  let rafId: number | null = null
-
-  const cleanup = () => {
-    if (observer) {
-      observer.disconnect()
-    }
-    if (rafId !== null) {
-      cancelAnimationFrameWithFallback(rafId)
-    }
-  }
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      const [entry] = entries
-      const wasVisible = isVisible
-      isVisible = entry.isIntersecting
-
-      // Only run the callback when transitioning from not visible to visible
-      if (!wasVisible && isVisible) {
-        rafId = requestAnimationFrameWithFallback(callback)
-      }
-    },
-    {
-      threshold: 0.1, // 10% visibility is enough to trigger
-      rootMargin: "100px", // Start loading a bit before it comes into view
-    },
-  )
-
-  observer.observe(element)
-  return cleanup
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 // Get performance mode based on device capabilities
 export function getPerformanceMode(): "high" | "medium" | "low" {
   if (prefersReducedMotion() || isLowEndDevice()) {
-    return "low"
+    return "low";
   }
 
   // Additional checks for medium performance
   if (typeof navigator !== "undefined") {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
     if (isMobile) {
-      return "medium"
+      return "medium";
     }
   }
 
-  return "high"
+  return "high";
 }

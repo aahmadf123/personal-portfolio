@@ -1,14 +1,22 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Search, Filter, ArrowUpDown, Star, StarHalf, X, RefreshCw } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import type { Skill } from "@/types/skills"
-import { toast } from "@/components/ui/use-toast"
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  Filter,
+  ArrowUpDown,
+  Star,
+  StarHalf,
+  X,
+  RefreshCw,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Skill } from "@/types/skills";
+import { toast } from "@/components/ui/use-toast";
 
 // Category icons mapping
 import {
@@ -27,7 +35,7 @@ import {
   Braces,
   Terminal,
   BarChart,
-} from "lucide-react"
+} from "lucide-react";
 
 // Get icon for a category
 const getCategoryIcon = (category: string) => {
@@ -46,19 +54,19 @@ const getCategoryIcon = (category: string) => {
     "Backend Development": <Terminal className="h-4 w-4" />,
     "Data Analytics": <BarChart className="h-4 w-4" />,
     "Frontend Development": <Braces className="h-4 w-4" />,
-  }
+  };
 
-  return iconMap[category] || <Zap className="h-4 w-4" />
-}
+  return iconMap[category] || <Zap className="h-4 w-4" />;
+};
 
 // Get proficiency level label
 const getProficiencyLabel = (proficiency: number): string => {
-  if (proficiency >= 9) return "Expert"
-  if (proficiency >= 7) return "Advanced"
-  if (proficiency >= 5) return "Intermediate"
-  if (proficiency >= 3) return "Basic"
-  return "Beginner"
-}
+  if (proficiency >= 9) return "Expert";
+  if (proficiency >= 7) return "Advanced";
+  if (proficiency >= 5) return "Intermediate";
+  if (proficiency >= 3) return "Basic";
+  return "Beginner";
+};
 
 // Get color for a category
 const getCategoryColor = (category: string): string => {
@@ -77,35 +85,35 @@ const getCategoryColor = (category: string): string => {
     "Backend Development": "#6366f1", // Indigo
     "Data Analytics": "#84cc16", // Lime
     "Frontend Development": "#06b6d4", // Cyan
-  }
+  };
 
-  return colorMap[category] || "#6b7280" // Gray default
-}
+  return colorMap[category] || "#6b7280"; // Gray default
+};
 
 export function SkillsDatabase() {
-  const [skills, setSkills] = useState<Skill[]>([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState<"proficiency" | "name">("proficiency")
-  const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid")
-  const [mounted, setMounted] = useState(false)
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-  const supabase = createClientComponentClient()
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"proficiency" | "name">("proficiency");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid");
+  const [mounted, setMounted] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const supabase = createClientComponentClient();
 
   const fetchSkills = useCallback(
     async (showRefreshing = false) => {
       try {
         if (showRefreshing) {
-          setRefreshing(true)
+          setRefreshing(true);
         } else {
-          setLoading(true)
+          setLoading(true);
         }
 
         // Use a cache-busting query parameter to avoid browser caching
-        const timestamp = new Date().getTime()
+        const timestamp = new Date().getTime();
         const response = await fetch(`/api/skills?t=${timestamp}`, {
           cache: "no-store",
           headers: {
@@ -113,26 +121,26 @@ export function SkillsDatabase() {
             Pragma: "no-cache",
             Expires: "0",
           },
-        })
+        });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch skills")
+          throw new Error("Failed to fetch skills");
         }
 
-        const data = await response.json()
-        setSkills(data)
-        setLastUpdated(new Date())
+        const data = await response.json();
+        setSkills(data);
+        setLastUpdated(new Date());
 
         if (showRefreshing) {
           toast({
             title: "Skills refreshed",
             description: `Successfully loaded ${data.length} skills from the database.`,
             duration: 3000,
-          })
+          });
         }
       } catch (err) {
-        console.error("Error fetching skills:", err)
-        setError("Failed to load skills data. Please try again later.")
+        console.error("Error fetching skills:", err);
+        setError("Failed to load skills data. Please try again later.");
 
         if (showRefreshing) {
           toast({
@@ -140,103 +148,125 @@ export function SkillsDatabase() {
             description: "Could not refresh skills data. Please try again.",
             variant: "destructive",
             duration: 3000,
-          })
+          });
         }
       } finally {
-        setLoading(false)
-        setRefreshing(false)
+        setLoading(false);
+        setRefreshing(false);
       }
     },
-    [toast],
-  )
+    [toast]
+  );
 
   const handleRefresh = useCallback(() => {
-    fetchSkills(true)
-  }, [fetchSkills])
+    fetchSkills(true);
+  }, [fetchSkills]);
 
   useEffect(() => {
-    setMounted(true)
-    fetchSkills()
+    setMounted(true);
+    fetchSkills();
 
-    // Set up a polling interval to check for updates every minute
+    // Set up a polling interval to check for updates every 6 hours
     const intervalId = setInterval(() => {
-      fetchSkills()
-    }, 60000) // 60 seconds
+      fetchSkills();
+    }, 21600000); // 6 hours (21600000 milliseconds)
 
-    return () => clearInterval(intervalId)
-  }, [fetchSkills])
+    return () => clearInterval(intervalId);
+  }, [fetchSkills]);
 
   // Get unique categories from the skills data
   const categories = useMemo(() => {
-    return Array.from(new Set(skills.map((skill) => skill.category))).sort()
-  }, [skills])
+    return Array.from(new Set(skills.map((skill) => skill.category))).sort();
+  }, [skills]);
 
   // Filter and sort skills
   const filteredAndSortedSkills = useMemo(() => {
-    let result = skills
+    let result = skills;
 
     // Filter by category
     if (activeCategory) {
-      result = result.filter((skill) => skill.category === activeCategory)
+      result = result.filter((skill) => skill.category === activeCategory);
     }
 
     // Filter by search query
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       result = result.filter(
         (skill) =>
           skill.name.toLowerCase().includes(query) ||
           skill.category.toLowerCase().includes(query) ||
-          (skill.description && skill.description.toLowerCase().includes(query)),
-      )
+          (skill.description && skill.description.toLowerCase().includes(query))
+      );
     }
 
     // Sort
     if (sortBy === "proficiency") {
-      result = [...result].sort((a, b) => b.proficiency - a.proficiency)
+      result = [...result].sort((a, b) => b.proficiency - a.proficiency);
     } else {
-      result = [...result].sort((a, b) => a.name.localeCompare(b.name))
+      result = [...result].sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    return result
-  }, [skills, activeCategory, searchQuery, sortBy])
+    return result;
+  }, [skills, activeCategory, searchQuery, sortBy]);
 
   // Group skills by category
   const skillsByCategory = useMemo(() => {
-    const grouped: Record<string, Skill[]> = {}
+    const grouped: Record<string, Skill[]> = {};
 
     filteredAndSortedSkills.forEach((skill) => {
       if (!grouped[skill.category]) {
-        grouped[skill.category] = []
+        grouped[skill.category] = [];
       }
-      grouped[skill.category].push(skill)
-    })
+      grouped[skill.category].push(skill);
+    });
 
     // Sort categories by name
-    return Object.fromEntries(Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)))
-  }, [filteredAndSortedSkills])
+    return Object.fromEntries(
+      Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b))
+    );
+  }, [filteredAndSortedSkills]);
 
   // Generate star rating based on proficiency
   const renderStarRating = (proficiency: number) => {
-    const fullStars = Math.floor(proficiency / 2)
-    const hasHalfStar = proficiency % 2 >= 1
+    const fullStars = Math.floor(proficiency / 2);
+    const hasHalfStar = proficiency % 2 >= 1;
 
     return (
       <div className="flex items-center">
         {[...Array(5)].map((_, i) => {
           if (i < fullStars) {
-            return <Star key={i} size={12} fill="currentColor" className="text-amber-500" />
+            return (
+              <Star
+                key={i}
+                size={12}
+                fill="currentColor"
+                className="text-amber-500"
+              />
+            );
           } else if (i === fullStars && hasHalfStar) {
-            return <StarHalf key={i} size={12} fill="currentColor" className="text-amber-500" />
+            return (
+              <StarHalf
+                key={i}
+                size={12}
+                fill="currentColor"
+                className="text-amber-500"
+              />
+            );
           } else {
-            return <Star key={i} size={12} className="text-gray-300 dark:text-gray-600" />
+            return (
+              <Star
+                key={i}
+                size={12}
+                className="text-gray-300 dark:text-gray-600"
+              />
+            );
           }
         })}
       </div>
-    )
-  }
+    );
+  };
 
-  if (!mounted) return null
+  if (!mounted) return null;
 
   return (
     <section className="py-16 md:py-24 relative overflow-hidden" id="skills">
@@ -263,8 +293,8 @@ export function SkillsDatabase() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Explore my technical skills and expertise across various domains including programming, data science, web
-            development, and more.
+            Explore my technical skills and expertise across various domains
+            including programming, data science, web development, and more.
           </motion.p>
         </div>
 
@@ -315,7 +345,9 @@ export function SkillsDatabase() {
                   </div>
                   <button
                     className={`px-2.5 py-1.5 text-xs rounded-md flex items-center gap-1 ${
-                      sortBy === "proficiency" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+                      sortBy === "proficiency"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
                     }`}
                     onClick={() => setSortBy("proficiency")}
                   >
@@ -324,7 +356,9 @@ export function SkillsDatabase() {
                   </button>
                   <button
                     className={`px-2.5 py-1.5 text-xs rounded-md flex items-center gap-1 ${
-                      sortBy === "name" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+                      sortBy === "name"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
                     }`}
                     onClick={() => setSortBy("name")}
                   >
@@ -340,7 +374,9 @@ export function SkillsDatabase() {
                   </div>
                   <button
                     className={`px-2.5 py-1.5 text-xs rounded-md ${
-                      viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+                      viewMode === "grid"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
                     }`}
                     onClick={() => setViewMode("grid")}
                   >
@@ -348,7 +384,9 @@ export function SkillsDatabase() {
                   </button>
                   <button
                     className={`px-2.5 py-1.5 text-xs rounded-md ${
-                      viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+                      viewMode === "list"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
                     }`}
                     onClick={() => setViewMode("list")}
                   >
@@ -356,7 +394,9 @@ export function SkillsDatabase() {
                   </button>
                   <button
                     className={`px-2.5 py-1.5 text-xs rounded-md ${
-                      viewMode === "compact" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+                      viewMode === "compact"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
                     }`}
                     onClick={() => setViewMode("compact")}
                   >
@@ -372,12 +412,18 @@ export function SkillsDatabase() {
                   disabled={refreshing}
                   className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+                  <RefreshCw
+                    className={`h-3.5 w-3.5 ${
+                      refreshing ? "animate-spin" : ""
+                    }`}
+                  />
                   {refreshing ? "Refreshing..." : "Refresh Skills"}
                 </button>
 
                 {lastUpdated && (
-                  <div className="text-xs text-muted-foreground">Last updated: {lastUpdated.toLocaleTimeString()}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Last updated: {lastUpdated.toLocaleTimeString()}
+                  </div>
                 )}
               </div>
 
@@ -393,11 +439,16 @@ export function SkillsDatabase() {
                 {categories.map((category) => (
                   <Badge
                     key={category}
-                    variant={activeCategory === category ? "default" : "outline"}
+                    variant={
+                      activeCategory === category ? "default" : "outline"
+                    }
                     className="cursor-pointer hover:bg-primary/90 transition-colors"
                     onClick={() => setActiveCategory(category)}
                     style={{
-                      backgroundColor: activeCategory === category ? getCategoryColor(category) : "transparent",
+                      backgroundColor:
+                        activeCategory === category
+                          ? getCategoryColor(category)
+                          : "transparent",
                       borderColor: getCategoryColor(category),
                       color: activeCategory === category ? "white" : undefined,
                     }}
@@ -412,7 +463,8 @@ export function SkillsDatabase() {
 
               {/* Results info */}
               <div className="text-sm text-muted-foreground">
-                Showing {filteredAndSortedSkills.length} of {skills.length} skills
+                Showing {filteredAndSortedSkills.length} of {skills.length}{" "}
+                skills
                 {activeCategory && ` in ${activeCategory}`}
                 {searchQuery && ` matching "${searchQuery}"`}
               </div>
@@ -433,12 +485,17 @@ export function SkillsDatabase() {
                         <div className="h-full rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                           <div
                             className="h-1.5"
-                            style={{ backgroundColor: skill.color || getCategoryColor(skill.category) }}
+                            style={{
+                              backgroundColor:
+                                skill.color || getCategoryColor(skill.category),
+                            }}
                           ></div>
                           <div className="p-4 space-y-3">
                             <div className="flex items-start justify-between">
                               <div className="space-y-1">
-                                <h3 className="font-medium text-base">{skill.name}</h3>
+                                <h3 className="font-medium text-base">
+                                  {skill.name}
+                                </h3>
                                 <div className="flex items-center text-xs text-muted-foreground">
                                   {getCategoryIcon(skill.category)}
                                   <span className="ml-1">{skill.category}</span>
@@ -466,20 +523,31 @@ export function SkillsDatabase() {
                                   {renderStarRating(skill.proficiency)}
                                   <span
                                     className="text-xs font-medium ml-1"
-                                    style={{ color: skill.color || getCategoryColor(skill.category) }}
+                                    style={{
+                                      color:
+                                        skill.color ||
+                                        getCategoryColor(skill.category),
+                                    }}
                                   >
                                     {getProficiencyLabel(skill.proficiency)}
                                   </span>
                                 </div>
-                                <span className="text-xs text-muted-foreground">{skill.proficiency * 10}%</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {skill.proficiency * 10}%
+                                </span>
                               </div>
                               <Progress
                                 value={skill.proficiency * 10}
                                 className="h-1.5"
                                 indicatorClassName="bg-gradient-to-r"
                                 style={{
-                                  "--tw-gradient-from": `${skill.color || getCategoryColor(skill.category)}80`,
-                                  "--tw-gradient-to": skill.color || getCategoryColor(skill.category),
+                                  "--tw-gradient-from": `${
+                                    skill.color ||
+                                    getCategoryColor(skill.category)
+                                  }80`,
+                                  "--tw-gradient-to":
+                                    skill.color ||
+                                    getCategoryColor(skill.category),
                                 }}
                               />
                             </div>
@@ -493,62 +561,84 @@ export function SkillsDatabase() {
 
               {viewMode === "list" && (
                 <div className="space-y-8">
-                  {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
-                    <div key={category} className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-6 h-6 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: `${getCategoryColor(category)}20` }}
-                        >
-                          {getCategoryIcon(category)}
-                        </div>
-                        <h3 className="text-xl font-semibold">{category}</h3>
-                        <Badge variant="outline" className="ml-2">
-                          {categorySkills.length}
-                        </Badge>
-                      </div>
-                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {categorySkills.map((skill) => (
+                  {Object.entries(skillsByCategory).map(
+                    ([category, categorySkills]) => (
+                      <div key={category} className="space-y-4">
+                        <div className="flex items-center gap-2">
                           <div
-                            key={skill.id}
-                            className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/10 transition-colors"
+                            className="w-6 h-6 rounded-full flex items-center justify-center"
+                            style={{
+                              backgroundColor: `${getCategoryColor(
+                                category
+                              )}20`,
+                            }}
                           >
+                            {getCategoryIcon(category)}
+                          </div>
+                          <h3 className="text-xl font-semibold">{category}</h3>
+                          <Badge variant="outline" className="ml-2">
+                            {categorySkills.length}
+                          </Badge>
+                        </div>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                          {categorySkills.map((skill) => (
                             <div
-                              className="w-1.5 h-10 rounded-full"
-                              style={{ backgroundColor: skill.color || getCategoryColor(skill.category) }}
-                            ></div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
-                                <h4 className="font-medium truncate">{skill.name}</h4>
-                                {skill.is_featured && <Zap className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />}
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Progress
-                                  value={skill.proficiency * 10}
-                                  className="h-1.5 flex-1"
-                                  indicatorClassName="bg-gradient-to-r"
-                                  style={{
-                                    "--tw-gradient-from": `${skill.color || getCategoryColor(skill.category)}80`,
-                                    "--tw-gradient-to": skill.color || getCategoryColor(skill.category),
-                                  }}
-                                />
-                                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                  {skill.proficiency * 10}%
-                                </span>
+                              key={skill.id}
+                              className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/10 transition-colors"
+                            >
+                              <div
+                                className="w-1.5 h-10 rounded-full"
+                                style={{
+                                  backgroundColor:
+                                    skill.color ||
+                                    getCategoryColor(skill.category),
+                                }}
+                              ></div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-medium truncate">
+                                    {skill.name}
+                                  </h4>
+                                  {skill.is_featured && (
+                                    <Zap className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Progress
+                                    value={skill.proficiency * 10}
+                                    className="h-1.5 flex-1"
+                                    indicatorClassName="bg-gradient-to-r"
+                                    style={{
+                                      "--tw-gradient-from": `${
+                                        skill.color ||
+                                        getCategoryColor(skill.category)
+                                      }80`,
+                                      "--tw-gradient-to":
+                                        skill.color ||
+                                        getCategoryColor(skill.category),
+                                    }}
+                                  />
+                                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                    {skill.proficiency * 10}%
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               )}
 
               {viewMode === "compact" && (
                 <Tabs defaultValue={categories[0] || "all"} className="w-full">
                   <TabsList className="flex flex-wrap h-auto mb-6">
-                    <TabsTrigger value="all" onClick={() => setActiveCategory(null)}>
+                    <TabsTrigger
+                      value="all"
+                      onClick={() => setActiveCategory(null)}
+                    >
                       All
                     </TabsTrigger>
                     {categories.map((category) => (
@@ -573,20 +663,32 @@ export function SkillsDatabase() {
                         >
                           <div
                             className="w-2 h-2 rounded-full mb-2"
-                            style={{ backgroundColor: skill.color || getCategoryColor(skill.category) }}
+                            style={{
+                              backgroundColor:
+                                skill.color || getCategoryColor(skill.category),
+                            }}
                           ></div>
-                          <h4 className="text-sm font-medium line-clamp-1">{skill.name}</h4>
+                          <h4 className="text-sm font-medium line-clamp-1">
+                            {skill.name}
+                          </h4>
                           <div className="mt-1 flex items-center justify-center">
                             <Progress
                               value={skill.proficiency * 10}
                               className="h-1 w-12"
                               indicatorClassName="bg-gradient-to-r"
                               style={{
-                                "--tw-gradient-from": `${skill.color || getCategoryColor(skill.category)}80`,
-                                "--tw-gradient-to": skill.color || getCategoryColor(skill.category),
+                                "--tw-gradient-from": `${
+                                  skill.color ||
+                                  getCategoryColor(skill.category)
+                                }80`,
+                                "--tw-gradient-to":
+                                  skill.color ||
+                                  getCategoryColor(skill.category),
                               }}
                             />
-                            <span className="text-xs text-muted-foreground ml-1">{skill.proficiency * 10}%</span>
+                            <span className="text-xs text-muted-foreground ml-1">
+                              {skill.proficiency * 10}%
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -594,7 +696,11 @@ export function SkillsDatabase() {
                   </TabsContent>
 
                   {categories.map((category) => (
-                    <TabsContent key={category} value={category} className="mt-0">
+                    <TabsContent
+                      key={category}
+                      value={category}
+                      className="mt-0"
+                    >
                       <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                         {skills
                           .filter((skill) => skill.category === category)
@@ -605,20 +711,33 @@ export function SkillsDatabase() {
                             >
                               <div
                                 className="w-2 h-2 rounded-full mb-2"
-                                style={{ backgroundColor: skill.color || getCategoryColor(skill.category) }}
+                                style={{
+                                  backgroundColor:
+                                    skill.color ||
+                                    getCategoryColor(skill.category),
+                                }}
                               ></div>
-                              <h4 className="text-sm font-medium line-clamp-1">{skill.name}</h4>
+                              <h4 className="text-sm font-medium line-clamp-1">
+                                {skill.name}
+                              </h4>
                               <div className="mt-1 flex items-center justify-center">
                                 <Progress
                                   value={skill.proficiency * 10}
                                   className="h-1 w-12"
                                   indicatorClassName="bg-gradient-to-r"
                                   style={{
-                                    "--tw-gradient-from": `${skill.color || getCategoryColor(skill.category)}80`,
-                                    "--tw-gradient-to": skill.color || getCategoryColor(skill.category),
+                                    "--tw-gradient-from": `${
+                                      skill.color ||
+                                      getCategoryColor(skill.category)
+                                    }80`,
+                                    "--tw-gradient-to":
+                                      skill.color ||
+                                      getCategoryColor(skill.category),
                                   }}
                                 />
-                                <span className="text-xs text-muted-foreground ml-1">{skill.proficiency * 10}%</span>
+                                <span className="text-xs text-muted-foreground ml-1">
+                                  {skill.proficiency * 10}%
+                                </span>
                               </div>
                             </div>
                           ))}
@@ -632,5 +751,5 @@ export function SkillsDatabase() {
         )}
       </div>
     </section>
-  )
+  );
 }

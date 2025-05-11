@@ -1,161 +1,101 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ChevronRight } from "lucide-react"
-import { motion } from "framer-motion"
-import { Modal } from "./ui/modal"
-import type { TimelineEntry } from "./interactive_timeline"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { ExternalLink } from "lucide-react";
+import { formatDate } from "@/lib/date-utils";
+import type { TimelineEntry } from "@/components/optimized-timeline";
 
 interface TimelineDetailProps {
-  entry: TimelineEntry
+  entry: TimelineEntry;
+  onClose: () => void;
 }
 
-export function TimelineDetail({ entry }: TimelineDetailProps) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  // Get color based on entry type
-  const getColor = (type: string) => {
-    switch (type) {
-      case "education":
-        return "tertiary"
-      case "work":
-        return "quaternary"
-      case "project":
-        return "secondary"
-      case "achievement":
-        return "accent"
-      default:
-        return "tertiary"
-    }
-  }
-
-  const color = getColor(entry.type)
+export function TimelineDetail({ entry, onClose }: TimelineDetailProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <>
-      <motion.button
-        onClick={() => setIsOpen(true)}
-        className={`inline-flex items-center mt-3 text-xs font-medium text-${color} hover:underline`}
-        whileHover={{ x: 3 }}
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="bg-card w-full max-w-2xl rounded-lg shadow-lg border border-border overflow-hidden"
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
       >
-        Learn more
-        <motion.div
-          animate={{ x: [0, 3, 0] }}
-          transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, repeatType: "loop" }}
-        >
-          <ChevronRight className="h-3 w-3 ml-1" />
-        </motion.div>
-      </motion.button>
+        {entry.image && (
+          <div className="relative w-full h-48 bg-muted">
+            <motion.img
+              src={entry.image}
+              alt={entry.title}
+              className="w-full h-full object-cover"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: imageLoaded ? 1 : 0 }}
+              onLoad={() => setImageLoaded(true)}
+            />
+            {!imageLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+          </div>
+        )}
 
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={entry.title}>
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-${color}/10 text-${color}`}
+        <div className="p-6">
+          <div className="flex justify-between items-start">
+            <h2 className="text-2xl font-bold">{entry.title}</h2>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-full hover:bg-muted"
+              aria-label="Close"
             >
-              {entry.type.charAt(0).toUpperCase() + entry.type.slice(1)}
-            </span>
-            <span
-              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-${color}/10 text-${color}`}
-            >
-              {entry.startDate} - {entry.endDate}
-            </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
 
-          <div>
-            <h3 className="text-lg font-bold mb-1">{entry.title}</h3>
-            <p className={`text-${color} font-medium`}>{entry.organization}</p>
-          </div>
-
-          <div className="prose prose-sm dark:prose-invert max-w-none">
-            <p>{entry.description}</p>
-
-            {/* Additional content based on entry type */}
-            {entry.type === "education" && (
-              <div className="mt-4 space-y-4">
-                <h4 className="text-base font-semibold">Courses & Achievements</h4>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Advanced coursework in machine learning and artificial intelligence</li>
-                  <li>Graduated with honors, top 5% of class</li>
-                  <li>Research assistant for quantum computing applications</li>
-                  <li>Published paper on neural network optimization techniques</li>
-                </ul>
-              </div>
-            )}
-
-            {entry.type === "work" && (
-              <div className="mt-4 space-y-4">
-                <h4 className="text-base font-semibold">Key Responsibilities</h4>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Led development of computer vision algorithms for autonomous systems</li>
-                  <li>Collaborated with cross-functional teams to implement ML solutions</li>
-                  <li>Optimized neural network performance for edge devices</li>
-                  <li>Mentored junior engineers and interns</li>
-                </ul>
-
-                <h4 className="text-base font-semibold">Achievements</h4>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Reduced model inference time by 40% through optimization</li>
-                  <li>Implemented CI/CD pipeline reducing deployment time by 60%</li>
-                  <li>Awarded employee of the quarter for exceptional contributions</li>
-                </ul>
-              </div>
-            )}
-
-            {entry.type === "project" && (
-              <div className="mt-4 space-y-4">
-                <h4 className="text-base font-semibold">Project Details</h4>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Developed novel algorithms for real-time object detection</li>
-                  <li>Implemented system using PyTorch and TensorFlow</li>
-                  <li>Achieved 95% accuracy on benchmark datasets</li>
-                  <li>Open-sourced code with over 500 GitHub stars</li>
-                </ul>
-
-                <div className="mt-4">
-                  <h4 className="text-base font-semibold">Technologies Used</h4>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {entry.tags?.map((tag) => (
-                      <span
-                        key={tag}
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-${color}/10 text-${color}`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {entry.type === "achievement" && (
-              <div className="mt-4 space-y-4">
-                <h4 className="text-base font-semibold">Achievement Details</h4>
-                <p>
-                  This recognition highlights exceptional contributions to the field and demonstrates expertise in
-                  cutting-edge technologies and methodologies.
-                </p>
-
-                <div className="p-4 border rounded-md bg-gradient-to-r from-primary/5 to-secondary/5">
-                  <h5 className="text-sm font-semibold mb-2">Impact</h5>
-                  <p className="text-sm">
-                    This achievement has opened doors to collaboration with leading researchers and institutions,
-                    furthering the advancement of technology in this domain.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Tags */}
-          {entry.tags && entry.tags.length > 0 && (
+          <div className="mt-2 text-muted-foreground">
+            <div className="font-medium text-foreground">
+              {entry.organization}
+            </div>
             <div>
-              <h4 className="text-sm font-semibold mb-2">Related Skills</h4>
-              <div className="flex flex-wrap gap-2">
-                {entry.tags.map((tag, index) => (
+              {formatDate(entry.startDate)} - {formatDate(entry.endDate)}
+            </div>
+            {entry.location && <div>{entry.location}</div>}
+          </div>
+
+          <div className="mt-4">
+            <p className="whitespace-pre-line">{entry.description}</p>
+          </div>
+
+          {entry.tags && entry.tags.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium mb-2">
+                Technologies & Skills
+              </h3>
+              <div className="flex flex-wrap gap-1.5">
+                {entry.tags.map((tag) => (
                   <span
                     key={tag}
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-${index % 4 === 0 ? "primary" : index % 4 === 1 ? "secondary" : index % 4 === 2 ? "tertiary" : "quaternary"}/10 text-${index % 4 === 0 ? "primary" : index % 4 === 1 ? "secondary" : index % 4 === 2 ? "tertiary" : "quaternary"}`}
+                    className="px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground"
                   >
                     {tag}
                   </span>
@@ -163,8 +103,21 @@ export function TimelineDetail({ entry }: TimelineDetailProps) {
               </div>
             </div>
           )}
+
+          {entry.link && (
+            <div className="mt-6">
+              <a
+                href={entry.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-sm text-primary hover:underline"
+              >
+                Visit website <ExternalLink className="ml-1 h-3 w-3" />
+              </a>
+            </div>
+          )}
         </div>
-      </Modal>
-    </>
-  )
+      </motion.div>
+    </motion.div>
+  );
 }

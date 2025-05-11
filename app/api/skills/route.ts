@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAllSkills } from "@/lib/skill-service";
 import { revalidatePath } from "next/cache";
 
-export const revalidate = 3600; // Cache GET for 1 hour
+export const revalidate = 43200; // Cache GET for 12 hours (43200 seconds)
 
 export async function GET() {
   try {

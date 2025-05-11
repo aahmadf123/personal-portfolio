@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   BarChart,
   FileText,
@@ -17,28 +17,37 @@ import {
   RefreshCw,
   FlaskRoundIcon as Flask,
   Clock,
-} from "lucide-react"
+  Award,
+} from "lucide-react";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
-    href: string
-    title: string
-    icon?: React.ReactNode
-  }[]
+    href: string;
+    title: string;
+    icon?: React.ReactNode;
+  }[];
 }
 
 export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
-    <nav className={cn("flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1", className)} {...props}>
+    <nav
+      className={cn(
+        "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
+        className
+      )}
+      {...props}
+    >
       {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           className={cn(
             "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-            pathname === item.href ? "bg-accent text-accent-foreground" : "transparent",
+            pathname === item.href
+              ? "bg-accent text-accent-foreground"
+              : "transparent"
           )}
         >
           {item.icon && <span className="mr-2 h-4 w-4">{item.icon}</span>}
@@ -46,7 +55,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
         </Link>
       ))}
     </nav>
-  )
+  );
 }
 
 export const adminNavItems = [
@@ -86,6 +95,11 @@ export const adminNavItems = [
     icon: <Clock className="h-4 w-4" />,
   },
   {
+    title: "Achievements",
+    href: "/admin/achievements",
+    icon: <Award className="h-4 w-4" />,
+  },
+  {
     title: "Media Library",
     href: "/admin/media-library",
     icon: <ImageIcon className="h-4 w-4" />,
@@ -105,4 +119,4 @@ export const adminNavItems = [
     href: "/admin/content-revalidation",
     icon: <RefreshCw className="h-4 w-4" />,
   },
-]
+];

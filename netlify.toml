@@ -1,5 +1,5 @@
 [build]
-  command = "next build"
+  command = "pnpm install && next build"
   publish = ".next"
 
 [build.environment]
@@ -11,6 +11,8 @@
   # We don't need to redefine Supabase variables here
   # They should be set in Netlify UI Environment Variables section
   NEXT_PUBLIC_SUPABASE_BUCKET = "profolio-bucket"
+  # Force pnpm to update lock file if needed
+  NPM_FLAGS = "--no-frozen-lockfile"
 
 # Configure the Netlify Next.js plugin
 [[plugins]]
